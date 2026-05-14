@@ -93,7 +93,7 @@ The login page shows all six accounts as clickable cards — clicking any row au
 
 ### Setup
 ```bash
-git clone https://github.com/<your-username>/cx-platform.git
+git clone https://github.com/raidalghamdi/cx-platform.git
 cd cx-platform
 npm install
 npm run dev
@@ -113,7 +113,7 @@ NODE_ENV=production node dist/index.cjs
 
 ### Vercel (frontend only)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F<your-username>%2Fcx-platform)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fraidalghamdi%2Fcx-platform)
 
 Set **Build Command** to `npm run build` and **Output Directory** to `dist/public`.
 
