@@ -1,0 +1,273 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CX Platform — DGA Design System (Saudi Digital Government Authority)
+   Primary: SA-500 Saudi green #25935F — official, formal, on-standard.
+   Accent: Gold-500 #F8BD02 — emphasis, KSA flag accent.
+   Quality bar: looks like it could be hosted at gov.sa.
+   Reference: dga_design_system.md */
+:root {
+  --button-outline: rgba(22, 106, 69, 0.12);
+  --badge-outline: rgba(22, 106, 69, 0.08);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(13, 18, 28, 0.04);
+  --elevate-2: rgba(13, 18, 28, 0.09);
+
+  /* Core surfaces — DGA neutral palette */
+  --background: 0 0% 100%;             /* #FFFFFF */
+  --foreground: 218 38% 8%;            /* #0D121C Gray-950 */
+  --border: 220 13% 91%;               /* #E5E7EB Gray-200 */
+  --card: 0 0% 100%;                   /* #FFFFFF */
+  --card-foreground: 218 38% 8%;
+  --card-border: 220 13% 91%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 218 38% 8%;
+  --popover-border: 220 13% 91%;
+
+  /* Sidebar — clean white with green active states */
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 215 14% 34%;   /* #4D5761 Gray-600 */
+  --sidebar-border: 220 13% 91%;
+  --sidebar-primary: 152 60% 36%;      /* SA-500 #25935F */
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 144 56% 94%;       /* SA-50 #F3FCF6 hover tint */
+  --sidebar-accent-foreground: 152 64% 26%; /* SA-700 #166A45 */
+  --sidebar-ring: 152 60% 36%;
+
+  /* Primary — Saudi green SA-500 #25935F */
+  --primary: 152 60% 36%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary — clean neutral */
+  --secondary: 210 20% 98%;            /* #F9FAFB Gray-50 */
+  --secondary-foreground: 218 38% 8%;
+
+  /* Muted */
+  --muted: 220 14% 96%;                /* #F3F4F6 Gray-100 */
+  --muted-foreground: 215 14% 34%;     /* #4D5761 Gray-600 */
+
+  /* Accent — Gold-500 #F8BD02 (KSA flag gold) */
+  --accent: 46 99% 49%;
+  --accent-foreground: 32 64% 14%;     /* Gold-900 #3B2F0A */
+
+  /* Destructive — Error-600 */
+  --destructive: 4 86% 51%;            /* #D92D20 */
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 220 13% 87%;                /* #D1D5DB Gray-300 */
+  --ring: 152 60% 36%;
+
+  /* Chart palette — DGA brand-aligned, accessible */
+  --chart-1: 152 60% 36%;              /* SA-500 Saudi green */
+  --chart-2: 46 99% 49%;               /* Gold-500 */
+  --chart-3: 215 91% 58%;              /* Info-500 #2E90FA */
+  --chart-4: 281 32% 47%;              /* Lavender-500 #80519F */
+  --chart-5: 25 96% 50%;               /* Warning-500 #F79009 */
+
+  /* Sentiment helpers — DGA semantic palette */
+  --sentiment-positive: 152 71% 39%;   /* Success-500 #17B26A */
+  --sentiment-neutral: 25 96% 50%;     /* Warning-500 #F79009 */
+  --sentiment-negative: 4 90% 58%;     /* Error-500 #F04438 */
+  --gold-rule: 46 99% 49%;             /* DGA Gold-500 thin rule */
+
+  /* DGA brand color scale — for direct use */
+  --sa-50: 144 56% 94%;                /* #F3FCF6 */
+  --sa-100: 142 56% 92%;               /* #DFF6E7 */
+  --sa-300: 145 53% 69%;               /* #88D8AD focus ring */
+  --sa-500: 152 60% 36%;               /* #25935F */
+  --sa-600: 152 65% 31%;               /* #1B8354 */
+  --sa-700: 152 64% 26%;               /* #166A45 */
+  --gold-500: 46 99% 49%;              /* #F8BD02 */
+  --lavender-500: 281 32% 47%;         /* #80519F */
+
+  /* Typography — DGA standard: IBM Plex Sans Arabic / IBM Plex Sans */
+  --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-arabic: "IBM Plex Sans Arabic", "IBM Plex Sans", system-ui, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", Menlo, monospace;
+
+  --radius: 0.75rem;                   /* 12px — cards */
+
+  --shadow-2xs: 0 1px 2px 0 rgb(13 18 28 / 0.04);
+  --shadow-xs:  0 1px 2px 0 rgb(13 18 28 / 0.05);
+  --shadow-sm:  0 1px 3px 0 rgb(13 18 28 / 0.06), 0 1px 2px -1px rgb(13 18 28 / 0.06);
+  --shadow:     0 2px 4px -1px rgb(13 18 28 / 0.06), 0 4px 6px -2px rgb(13 18 28 / 0.04);
+  --shadow-md:  0 4px 6px -2px rgb(13 18 28 / 0.06), 0 8px 12px -4px rgb(13 18 28 / 0.06);
+  --shadow-lg:  0 10px 20px -6px rgb(13 18 28 / 0.10);
+  --shadow-xl:  0 20px 32px -8px rgb(13 18 28 / 0.12);
+  --shadow-2xl: 0 32px 60px -12px rgb(13 18 28 / 0.18);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+
+  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --sidebar-accent-border: hsl(var(--sidebar-accent));
+  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --primary-border: hsl(var(--primary));
+  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --secondary-border: hsl(var(--secondary));
+  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --muted-border: hsl(var(--muted));
+  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --accent-border: hsl(var(--accent));
+  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --destructive-border: hsl(var(--destructive));
+  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+}
+
+/* CX Platform is light-only — keep .dark identical to :root so any stray dark
+   class doesn't break the DGA visual language. */
+.dark {
+  --button-outline: rgba(22, 106, 69, 0.12);
+  --badge-outline: rgba(22, 106, 69, 0.08);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(13, 18, 28, 0.04);
+  --elevate-2: rgba(13, 18, 28, 0.09);
+  --background: 0 0% 100%;
+  --foreground: 218 38% 8%;
+  --border: 220 13% 91%;
+  --card: 0 0% 100%;
+  --card-foreground: 218 38% 8%;
+  --card-border: 220 13% 91%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 218 38% 8%;
+  --popover-border: 220 13% 91%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 215 14% 34%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-primary: 152 60% 36%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 144 56% 94%;
+  --sidebar-accent-foreground: 152 64% 26%;
+  --sidebar-ring: 152 60% 36%;
+  --primary: 152 60% 36%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 20% 98%;
+  --secondary-foreground: 218 38% 8%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 215 14% 34%;
+  --accent: 46 99% 49%;
+  --accent-foreground: 32 64% 14%;
+  --destructive: 4 86% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 220 13% 87%;
+  --ring: 152 60% 36%;
+  --chart-1: 152 60% 36%;
+  --chart-2: 46 99% 49%;
+  --chart-3: 215 91% 58%;
+  --chart-4: 281 32% 47%;
+  --chart-5: 25 96% 50%;
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  html { font-family: var(--font-sans); }
+  html[dir="rtl"] { font-family: var(--font-arabic); }
+
+  body {
+    @apply antialiased bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* DGA focus ring — 4px SA-300 #88D8AD */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--sa-500));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px hsl(var(--sa-300) / 0.5);
+  }
+
+  /* Subtle gold rule — KSA flag accent, thin */
+  .gold-rule {
+    background-image: linear-gradient(90deg, transparent 0%, hsl(var(--gold-rule)) 30%, hsl(var(--gold-rule)) 70%, transparent 100%);
+    height: 1px;
+    border: 0;
+  }
+
+  /* DGA gradient hero — SA-700 → SA-600 */
+  .dga-hero-gradient {
+    background-image: linear-gradient(135deg, hsl(var(--sa-700)) 0%, hsl(var(--sa-600)) 60%, hsl(var(--sa-500)) 100%);
+  }
+}
+
+@layer utilities {
+  input[type='search']::-webkit-search-cancel-button { @apply hidden; }
+
+  [contenteditable][data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+  }
+
+  .no-default-hover-elevate {}
+  .no-default-active-elevate {}
+
+  .toggle-elevate::before,
+  .toggle-elevate-2::before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .toggle-elevate.toggle-elevated::before { background-color: var(--elevate-2); }
+  .border.toggle-elevate::before { inset: -1px; }
+
+  .hover-elevate:not(.no-default-hover-elevate),
+  .active-elevate:not(.no-default-active-elevate),
+  .hover-elevate-2:not(.no-default-hover-elevate),
+  .active-elevate-2:not(.no-default-active-elevate) {
+    position: relative;
+    z-index: 0;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate)::after,
+  .active-elevate:not(.no-default-active-elevate)::after,
+  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:not(.no-default-active-elevate)::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+  }
+
+  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate:active:not(.no-default-active-elevate)::after { background-color: var(--elevate-1); }
+
+  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:active:not(.no-default-active-elevate)::after { background-color: var(--elevate-2); }
+
+  .border.hover-elevate::after,
+  .border.active-elevate::after,
+  .border.hover-elevate-2::after,
+  .border.active-elevate-2::after { inset: -1px; }
+
+  /* RTL utilities — flip flexbox/grid for icon+text combos when needed */
+  [dir="rtl"] .rtl-flip { transform: scaleX(-1); }
+}
+
+/* Hide scrollbar (used for horizontally-scrolling tab strips on mobile) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Card hover lift — adds a subtle elevation on hover */
+.card-lift { transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease; }
+.card-lift:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -10px rgba(15, 23, 42, 0.18), 0 4px 10px -4px rgba(15, 23, 42, 0.08); }
+
+/* Soft pulse for glowing logos / active markers */
+@keyframes soft-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+.animate-soft-pulse { animation: soft-pulse 2.4s ease-in-out infinite; }
+
+/* Gold corner accent stripe — pair with `relative overflow-hidden` parent */
+.accent-stripe::before {
+  content: ""; position: absolute; top: 0; bottom: 0;
+  width: 3px; background: linear-gradient(180deg, #F8BD02 0%, rgba(248, 189, 2, 0.4) 100%);
+}
+[dir="ltr"] .accent-stripe::before { left: 0; }
+[dir="rtl"] .accent-stripe::before { right: 0; }
