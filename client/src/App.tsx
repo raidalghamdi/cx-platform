@@ -11,6 +11,7 @@ import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AppShell } from "@/components/shell/AppShell";
 
 import Login from "@/pages/Login";
+import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import Complaints from "@/pages/Complaints";
 import Inbox from "@/pages/Inbox";
@@ -40,7 +41,7 @@ function Guard({ path, navKey, children }: { path: string; navKey?: string; chil
 
 function HomeRedirect() {
   const { user } = useAuth();
-  if (!user) return <Redirect to="/login" />;
+  if (!user) return <Landing />;
   return <Redirect to={user.landing} />;
 }
 
@@ -48,6 +49,7 @@ function AppRouter() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
+      <Route path="/landing" component={Landing} />
       <Route path="/about">{() => <Guard path="/about"><About /></Guard>}</Route>
       <Route path="/governance">{() => <Guard path="/governance"><Governance /></Guard>}</Route>
       <Route path="/programme">{() => <Guard path="/programme"><Programme /></Guard>}</Route>
