@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import { AuthProvider, useAuth, ROLE_NAV } from "@/contexts/AuthContext";
 import { JourneyProvider } from "@/contexts/JourneyContext";
+import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AppShell } from "@/components/shell/AppShell";
 
 import Login from "@/pages/Login";
@@ -71,6 +72,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LocaleProvider>
+        <AccessibilityProvider>
         <AuthProvider>
           <JourneyProvider>
             <TooltipProvider>
@@ -81,6 +83,7 @@ export default function App() {
             </TooltipProvider>
           </JourneyProvider>
         </AuthProvider>
+        </AccessibilityProvider>
       </LocaleProvider>
     </QueryClientProvider>
   );

@@ -1,5 +1,7 @@
 import { useLocale } from "@/contexts/LocaleContext";
 import { PageHeader } from "@/components/brand/PageHeader";
+import { UsabilityPanel } from "@/components/brand/UsabilityPanel";
+import { BeforeAfterImpact } from "@/components/brand/BeforeAfterImpact";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SentimentChip } from "@/components/brand/StatusChips";
@@ -154,6 +156,8 @@ export default function Dashboard() {
       <PageHeader
         Icon={LayoutDashboard}
         title={t("nav.dashboard")}
+        requirementIds={["FR-11", "FR-12", "NFR-21", "NFR-22"]}
+        standards={["ISO 9001 §9.1", "ISO 9241-11", "EFQM 2025 — Results", "DGA 5.20"]}
         subtitle={lang === "ar" ? "نظرة شاملة على أداء تجربة المستفيد هذا الشهر" : "A holistic view of customer experience performance this month"}
         actions={
           <>
@@ -174,6 +178,10 @@ export default function Dashboard() {
         <Kpi label={t("kpi.sla")} value={KPI.sla.value.toFixed(1)} numeric={KPI.sla.value} decimals={1} unit="%" delta={KPI.sla.delta} Icon={Timer} tint="violet" trend={[92,91.8,92.1,91.6,91.4,91.5,91.3,91.0,91.2]} />
         <Kpi label={t("kpi.open")} value={String(KPI.open.value)} numeric={KPI.open.value} delta={KPI.open.delta} inverted Icon={AlertCircle} tint="rose" trend={SLA_BREACH_TREND.map(d=>d.v)} />
       </div>
+
+      <UsabilityPanel />
+
+      <BeforeAfterImpact />
 
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">

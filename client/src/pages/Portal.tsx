@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { MY_REQUESTS } from "@/lib/seed";
 import { StatusBadge } from "@/components/brand/StatusChips";
+import { TafaalConsultations } from "@/components/portal/TafaalConsultations";
 import {
   FileText,
   Search,
@@ -97,6 +98,8 @@ export default function Portal() {
           return Tile;
         })}
       </div>
+
+      <TafaalConsultations />
 
       {/* My requests */}
       <Card className="shadow-card">

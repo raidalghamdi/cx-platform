@@ -33,6 +33,7 @@ import {
   type SlaStatus,
 } from "@/lib/seed";
 import { Filter, Search, Plus, MessageSquareWarning } from "lucide-react";
+import { BalaghBanner } from "@/components/brand/BalaghBanner";
 
 const STATUS_OPTIONS: ComplaintStatus[] = [
   "new",
@@ -69,6 +70,8 @@ export default function Complaints() {
       <PageHeader
         Icon={MessageSquareWarning}
         title={t("nav.complaints")}
+        requirementIds={["FR-61", "FR-62", "FR-67", "FR-68"]}
+        standards={["ISO 10002 §7.5", "DGA 5.18.2", "Vision 2030 — Service Excellence"]}
         subtitle={
           lang === "ar"
             ? `${rows.length} شكاوى ضمن نتائج البحث الحالية`
@@ -87,6 +90,8 @@ export default function Complaints() {
           </>
         }
       />
+
+      <BalaghBanner />
 
       <Card className="shadow-card mb-4">
         <CardContent className="p-3 flex flex-wrap items-center gap-2">

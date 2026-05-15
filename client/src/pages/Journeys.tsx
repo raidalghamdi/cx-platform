@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { LucideIcon, NewJourneyDialog, SENTIMENT_META } from "@/components/journeys/JourneyBits";
 import { Plus, ChevronRight, ChevronLeft, Trash2, Compass, ArrowUpRight } from "lucide-react";
 import { HeroPattern } from "@/components/brand/HeroPattern";
+import { CoDesignTracker } from "@/components/journeys/CoDesignTracker";
 import type { Sentiment } from "@/lib/seedJourneys";
 
 function dominantSentiment(scores: number[]): Sentiment {
@@ -41,6 +42,8 @@ export default function Journeys() {
       <PageHeader
         Icon={Compass}
         title={t("journeys.title")}
+        requirementIds={["FR-41", "FR-42", "FR-72", "FR-73"]}
+        standards={["ISO 9241-210", "DGA 5.18.3", "EFQM 2025 — Stakeholder Engagement"]}
         subtitle={`${journeys.length} ${t("journeys.count")} · ${t("journeys.subtitle")}`}
         actions={
           <NewJourneyDialog
@@ -52,6 +55,8 @@ export default function Journeys() {
           />
         }
       />
+
+      <CoDesignTracker />
 
       {/* Owner filter pills */}
       <div className="flex flex-wrap gap-2 mb-6">

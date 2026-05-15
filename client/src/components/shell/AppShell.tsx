@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth, ROLE_NAV } from "@/contexts/AuthContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { Logo } from "@/components/brand/Logo";
+import { AccessibilityPanel } from "@/components/shell/AccessibilityPanel";
 import {
   LayoutDashboard,
   Inbox,
@@ -194,6 +195,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Globe size={14} />
               {lang === "ar" ? "EN" : "العربية"}
             </button>
+
+            <AccessibilityPanel />
 
             <button
               className="relative p-2 rounded-md hover:bg-muted"
