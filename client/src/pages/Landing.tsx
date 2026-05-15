@@ -128,7 +128,7 @@ export default function Landing() {
                 ? "نُصغي. نستجيب. نُحسّن. منصة واحدة لكل تفاعل مع المستفيد."
                 : "Listen. Respond. Improve. One platform for every citizen interaction."}
             </h1>
-            <p className="body-lead text-white/90 max-w-2xl">
+            <p className="body-lead !text-white max-w-2xl drop-shadow-sm">
               {isAr
                 ? "منصة موحّدة وثنائية اللغة لإدارة تجربة المستفيد في القطاع الحكومي — مُحاذية لـ رؤية 2030، هيئة الحكومة الرقمية (DGA)، EFQM، ISO 9001/10002، PDPL، وضوابط الأمن السيبراني الوطنية."
                 : "A unified, bilingual government customer-experience platform aligned to Vision 2030, the Digital Government Authority (DGA), EFQM, ISO 9001/10002, PDPL, and Saudi cybersecurity essentials."}
