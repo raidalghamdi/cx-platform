@@ -113,7 +113,7 @@ export default function Journeys() {
                       {t(sm.key)}
                     </span>
                   </div>
-                  <h3 className="mt-3 text-[15px] font-semibold leading-snug text-foreground line-clamp-2">
+                  <h3 className="mt-3 text-base font-semibold leading-snug tracking-tight text-foreground line-clamp-2">
                     {pick(j.title)}
                   </h3>
                   <p className="mt-1 text-[12px] text-muted-foreground line-clamp-2 leading-snug">

@@ -1,6 +1,8 @@
 // Seed data for the Service Journeys module.
-// 5 prefilled bilingual journeys spanning realistic Saudi government CX scenarios.
-// All journey state is held in-memory via JourneyContext — this file just bootstraps it.
+// Real GAC (General Authority for Competition / الهيئة العامة للمنافسة)
+// e-services pulled from gac.gov.sa and monafsa.gac.gov.sa.
+// All 12 published services modeled as bilingual end-to-end journeys.
+// State is held in-memory via JourneyContext — this file just bootstraps it.
 
 export type Bi = { ar: string; en: string };
 
@@ -29,822 +31,886 @@ export type Journey = {
   title: Bi;
   subtitle: Bi;
   owner: Bi;
-  icon: string; // lucide icon for the journey card
-  types: Bi[]; // journey-type pills (Routine / Urgent / Specialist, etc.)
-  outcomes: Bi[]; // outcome paths (Confirmed / Rescheduled / Not Eligible, etc.)
+  icon: string;
+  types: Bi[];
+  outcomes: Bi[];
   stages: Stage[];
 };
 
-// Helper to build IDs quickly
-const id = () => Math.random().toString(36).slice(2, 9);
+let __seq = 0;
+const uid = () => `s${++__seq}-${Math.random().toString(36).slice(2, 7)}`;
+
+// Common stages every regulated GAC e-service starts with — surfaced bilingually.
+const nafathStage = (): Stage => ({
+  id: uid(),
+  icon: "ShieldCheck",
+  name: { ar: "الدخول عبر نفاذ", en: "Sign-in via Nafath" },
+  sla: { ar: "فوري", en: "Instant" },
+  sentiment: "neutral",
+  emotionScore: 0,
+  touchpoints: [
+    { id: uid(), label: { ar: "بوابة المنافسة (monafsa)", en: "GAC e-portal (monafsa)" } },
+    { id: uid(), label: { ar: "تطبيق نفاذ", en: "Nafath app" } },
+  ],
+  actions: [
+    { id: uid(), label: { ar: "اختيار تسجيل الدخول الموحد", en: "Choose single sign-on" } },
+    { id: uid(), label: { ar: "تأكيد طلب الدخول من تطبيق نفاذ", en: "Approve push from Nafath" } },
+  ],
+  entities: [
+    { id: uid(), label: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" } },
+    { id: uid(), label: { ar: "هيئة الحكومة الرقمية", en: "Digital Government Authority" } },
+  ],
+  opportunities: [
+    { id: uid(), label: { ar: "تسجيل دخول حيوي للأجهزة المتعددة", en: "Biometric SSO across devices" } },
+    { id: uid(), label: { ar: "تذكير ذكي قبل انتهاء الجلسة", en: "Smart reminder before session expiry" } },
+  ],
+});
+
+const ackStage = (slaAr: string, slaEn: string): Stage => ({
+  id: uid(),
+  icon: "BellRing",
+  name: { ar: "الإقرار والتأكيد", en: "Acknowledgement & confirmation" },
+  sla: { ar: slaAr, en: slaEn },
+  sentiment: "satisfied",
+  emotionScore: 1,
+  touchpoints: [
+    { id: uid(), label: { ar: "إشعار في البوابة", en: "Portal notification" } },
+    { id: uid(), label: { ar: "بريد إلكتروني / SMS", en: "Email / SMS" } },
+  ],
+  actions: [
+    { id: uid(), label: { ar: "استلام رقم مرجعي للطلب", en: "Receive request reference number" } },
+    { id: uid(), label: { ar: "تتبّع الحالة عبر لوحة الطلبات", en: "Track via request dashboard" } },
+  ],
+  entities: [
+    { id: uid(), label: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" } },
+  ],
+  opportunities: [
+    { id: uid(), label: { ar: "تنبيهات استباقية عند تغيّر الحالة", en: "Proactive status-change alerts" } },
+  ],
+});
 
 export const SEED_JOURNEYS: Journey[] = [
-  // ---------- 1. Healthcare Appointment ----------
+  // ───────────────────────── 1. Economic Concentration Notification ─────────────────────────
   {
-    id: "j-healthcare",
-    icon: "Stethoscope",
-    title: { ar: "رحلة موعد رعاية صحية", en: "Healthcare Appointment Journey" },
-    subtitle: {
-      ar: "من ملاحظة العَرَض إلى استكمال الزيارة واستبيان المتابعة",
-      en: "From symptom recognition to visit completion and follow-up survey",
+    id: "j-gac-econ-concentration-notify",
+    icon: "Network",
+    title: {
+      ar: "الإبلاغ عن تركز اقتصادي",
+      en: "Economic Concentration Notification",
     },
-    owner: { ar: "وزارة الصحة", en: "Ministry of Health" },
+    subtitle: {
+      ar: "إخطار الهيئة بعمليات الاندماج والاستحواذ والمشاريع المشتركة قبل إتمامها",
+      en: "Notify GAC of mergers, acquisitions and joint ventures before closing",
+    },
+    owner: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" },
     types: [
-      { ar: "روتيني · ٣ أيام", en: "Routine · 3 days" },
-      { ar: "طارئ · نفس اليوم", en: "Urgent · same day" },
-      { ar: "تخصصي · ١٤ يوماً", en: "Specialist · 14 days" },
+      { ar: "اندماج · ٩٠ يوماً", en: "Merger · 90 days" },
+      { ar: "استحواذ · ٩٠ يوماً", en: "Acquisition · 90 days" },
+      { ar: "مشروع مشترك", en: "Joint venture" },
     ],
     outcomes: [
-      { ar: "تم تأكيد الموعد", en: "Appointment Confirmed" },
-      { ar: "إعادة جدولة", en: "Rescheduled" },
-      { ar: "غير مؤهل", en: "Not Eligible" },
+      { ar: "موافقة", en: "Approved" },
+      { ar: "موافقة مشروطة", en: "Conditional approval" },
+      { ar: "رفض", en: "Rejected" },
     ],
     stages: [
+      nafathStage(),
       {
-        id: id(),
+        id: uid(),
+        icon: "ClipboardEdit",
+        name: { ar: "إعداد ملف التركز", en: "Prepare concentration file" },
+        sla: { ar: "وتيرة المقدم", en: "Applicant-paced" },
+        sentiment: "confused",
+        emotionScore: -1,
+        touchpoints: [
+          { id: uid(), label: { ar: "نموذج الإبلاغ الإلكتروني", en: "Online notification form" } },
+          { id: uid(), label: { ar: "حاسبة الرسوم", en: "Fee calculator" } },
+        ],
+        actions: [
+          { id: uid(), label: { ar: "إدخال بيانات الأطراف والأرقام المالية", en: "Enter party & financial figures" } },
+          { id: uid(), label: { ar: "رفع العقود والقوائم المالية", en: "Upload contracts & financials" } },
+          { id: uid(), label: { ar: "إقرار صحة البيانات", en: "Accuracy declaration" } },
+        ],
+        entities: [
+          { id: uid(), label: { ar: "الإدارة العامة للتركزات", en: "Concentrations Directorate" } },
+          { id: uid(), label: { ar: "المستشار القانوني", en: "Legal counsel" } },
+        ],
+        opportunities: [
+          { id: uid(), label: { ar: "قوالب جاهزة للقطاعات", en: "Sector-ready templates" } },
+          { id: uid(), label: { ar: "مدقّق ذكي للوثائق الناقصة", en: "AI document-completeness checker" } },
+        ],
+      },
+      {
+        id: uid(),
+        icon: "Send",
+        name: { ar: "تقديم الإخطار", en: "Submit notification" },
+        sla: { ar: "فوري", en: "Instant" },
+        sentiment: "satisfied",
+        emotionScore: 1,
+        touchpoints: [{ id: uid(), label: { ar: "بوابة المنافسة", en: "GAC e-portal" } }],
+        actions: [
+          { id: uid(), label: { ar: "سداد المقابل المالي", en: "Pay the prescribed fee" } },
+          { id: uid(), label: { ar: "تأكيد الإرسال", en: "Confirm submission" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "سداد", en: "SADAD" } }],
+        opportunities: [{ id: uid(), label: { ar: "حفظ تلقائي للمسودات", en: "Auto-save drafts" } }],
+      },
+      {
+        id: uid(),
         icon: "Search",
-        name: { ar: "التعرف على الأعراض والبحث", en: "Symptom recognition & search" },
-        sla: { ar: "مُعتمد على وتيرة المستفيد", en: "Customer-paced" },
-        sentiment: "confused",
-        emotionScore: -1,
+        name: { ar: "الفحص الفني والاقتصادي", en: "Technical & economic review" },
+        sla: { ar: "حتى ٩٠ يوماً", en: "Up to 90 days" },
+        sentiment: "neutral",
+        emotionScore: 0,
         touchpoints: [
-          { id: id(), label: { ar: "بوابة موعد", en: "Mawid portal" } },
-          { id: id(), label: { ar: "محرّك بحث", en: "Web search" } },
-          { id: id(), label: { ar: "صحة 937", en: "Seha 937 hotline" } },
+          { id: uid(), label: { ar: "غرفة بيانات الهيئة", en: "GAC data room" } },
+          { id: uid(), label: { ar: "اجتماعات متابعة عن بُعد", en: "Remote review meetings" } },
         ],
         actions: [
-          { id: id(), label: { ar: "وصف الأعراض", en: "Describes symptoms" } },
-          { id: id(), label: { ar: "البحث عن أقرب منشأة", en: "Looks up nearest facility" } },
-          { id: id(), label: { ar: "مقارنة الخيارات المتاحة", en: "Compares available options" } },
+          { id: uid(), label: { ar: "الرد على طلبات استكمال خلال ١٤ يوماً", en: "Respond to RFIs within 14 days" } },
+          { id: uid(), label: { ar: "تقديم تعهدات سلوكية / هيكلية", en: "Offer behavioural/structural remedies" } },
         ],
         entities: [
-          { id: id(), label: { ar: "وزارة الصحة", en: "Ministry of Health" } },
-          { id: id(), label: { ar: "مركز اتصال صحة", en: "Seha contact centre" } },
+          { id: uid(), label: { ar: "لجنة فحص التركزات", en: "Concentration review committee" } },
+          { id: uid(), label: { ar: "إدارة الدراسات الاقتصادية", en: "Economic Studies Dept." } },
         ],
         opportunities: [
-          { id: id(), label: { ar: "فرز ذكي للأعراض داخل التطبيق", en: "In-app smart symptom triage" } },
-          { id: id(), label: { ar: "اقتراح آلي لنوع التخصص", en: "Auto-suggest specialty type" } },
+          { id: uid(), label: { ar: "غرفة بيانات شفافة مع تتبع لحظي", en: "Transparent data room with live tracking" } },
+        ],
+      },
+      ackStage("خلال ٩٠ يوماً", "Within 90 days"),
+    ],
+  },
+
+  // ───────────────────────── 2. Verification of Non-Obligation ─────────────────────────
+  {
+    id: "j-gac-non-obligation",
+    icon: "BadgeCheck",
+    title: {
+      ar: "التحقق من عدم وجوب الإبلاغ",
+      en: "Verification of Non-Obligation to Notify",
+    },
+    subtitle: {
+      ar: "تأكيد رسمي بأن الصفقة دون عتبات الإبلاغ الإلزامي عن التركز الاقتصادي",
+      en: "Formal confirmation that a transaction is below mandatory notification thresholds",
+    },
+    owner: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" },
+    types: [{ ar: "صفقة دون العتبة · ١٥ يوماً", en: "Below-threshold deal · 15 days" }],
+    outcomes: [
+      { ar: "إقرار بعدم وجوب الإبلاغ", en: "Confirmation: not obligated" },
+      { ar: "وجوب الإبلاغ", en: "Obligated to notify" },
+    ],
+    stages: [
+      nafathStage(),
+      {
+        id: uid(),
+        icon: "FileSearch",
+        name: { ar: "إدخال بيانات الصفقة", en: "Enter transaction data" },
+        sla: { ar: "وتيرة المقدم", en: "Applicant-paced" },
+        sentiment: "neutral",
+        emotionScore: 0,
+        touchpoints: [{ id: uid(), label: { ar: "نموذج التحقق", en: "Verification form" } }],
+        actions: [
+          { id: uid(), label: { ar: "تحديد الأطراف وحجم المبيعات", en: "Identify parties & turnover" } },
+          { id: uid(), label: { ar: "إقرار بعدم تجاوز العتبات", en: "Declare below-threshold" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "إدارة فحص التركزات", en: "Concentration screening unit" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "تحقق فوري آلي من العتبات", en: "Instant automated threshold check" } },
         ],
       },
       {
-        id: id(),
-        icon: "ShieldCheck",
-        name: { ar: "التحقق عبر نفاذ", en: "Authentication via Nafath" },
+        id: uid(),
+        icon: "ScanLine",
+        name: { ar: "المراجعة الأولية", en: "Initial screening" },
+        sla: { ar: "حتى ١٥ يوماً", en: "Up to 15 days" },
+        sentiment: "satisfied",
+        emotionScore: 1,
+        touchpoints: [{ id: uid(), label: { ar: "بوابة المنافسة", en: "GAC e-portal" } }],
+        actions: [{ id: uid(), label: { ar: "متابعة حالة الطلب", en: "Track request status" } }],
+        entities: [{ id: uid(), label: { ar: "لجنة الفحص", en: "Screening committee" } }],
+        opportunities: [{ id: uid(), label: { ar: "إفادة آلية في حال اكتمال البيانات", en: "Auto-decision when data complete" } }],
+      },
+      ackStage("خلال ١٥ يوماً", "Within 15 days"),
+    ],
+  },
+
+  // ───────────────────────── 3. No-Objection Certificate Inquiry ─────────────────────────
+  {
+    id: "j-gac-noc-inquiry",
+    icon: "ScanSearch",
+    title: { ar: "الاستعلام عن شهادة عدم ممانعة", en: "No-Objection Certificate Inquiry" },
+    subtitle: {
+      ar: "التحقق من صحة شهادة عدم الممانعة الصادرة عن الهيئة لطلبات التركز الاقتصادي",
+      en: "Verify the authenticity of a GAC-issued no-objection certificate for an economic concentration",
+    },
+    owner: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" },
+    types: [{ ar: "استعلام فوري", en: "Instant inquiry" }],
+    outcomes: [
+      { ar: "شهادة صالحة", en: "Certificate valid" },
+      { ar: "شهادة غير موجودة", en: "Certificate not found" },
+    ],
+    stages: [
+      {
+        id: uid(),
+        icon: "Hash",
+        name: { ar: "إدخال الرقم المرجعي", en: "Enter reference number" },
         sla: { ar: "فوري", en: "Instant" },
         sentiment: "neutral",
         emotionScore: 0,
         touchpoints: [
-          { id: id(), label: { ar: "تطبيق موعد", en: "Mawid app" } },
-          { id: id(), label: { ar: "نفاذ", en: "Nafath" } },
+          { id: uid(), label: { ar: "بوابة المنافسة — استعلامات عامة", en: "GAC portal — public inquiries" } },
         ],
         actions: [
-          { id: id(), label: { ar: "تأكيد طلب الدخول", en: "Confirms login request" } },
-          { id: id(), label: { ar: "إدخال رقم الموبايل", en: "Enters mobile number" } },
+          { id: uid(), label: { ar: "لصق الرقم المرجعي للشهادة", en: "Paste certificate reference" } },
         ],
-        entities: [
-          { id: id(), label: { ar: "هيئة الحكومة الرقمية", en: "Digital Government Authority" } },
-          { id: id(), label: { ar: "وزارة الصحة", en: "Ministry of Health" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "تسجيل دخول بيومتري", en: "Biometric sign-in option" } },
-        ],
+        entities: [{ id: uid(), label: { ar: "أمانة سر التركزات", en: "Concentrations registry" } }],
+        opportunities: [{ id: uid(), label: { ar: "مسح QR من نسخة PDF للشهادة", en: "Scan QR from PDF certificate" } }],
       },
       {
-        id: id(),
-        icon: "CalendarSearch",
-        name: { ar: "اختيار المنشأة والموعد", en: "Choose facility & slot" },
-        sla: { ar: "مُعتمد على وتيرة المستفيد", en: "Customer-paced" },
-        sentiment: "satisfied",
-        emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "تطبيق موعد", en: "Mawid app" } },
-          { id: id(), label: { ar: "خرائط نقاط الرعاية", en: "Care-point map" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "اختيار المركز الصحي", en: "Selects health centre" } },
-          { id: id(), label: { ar: "تحديد التاريخ والساعة", en: "Picks date and time" } },
-          { id: id(), label: { ar: "مراجعة بيانات الطبيب", en: "Reviews physician info" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "تجمّع صحي إقليمي", en: "Regional health cluster" } },
-          { id: id(), label: { ar: "المركز الصحي المختار", en: "Selected health centre" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "تنبيه بالأماكن الشاغرة في الوقت الفعلي", en: "Real-time slot availability alerts" } },
-          { id: id(), label: { ar: "اقتراح بدائل أقرب وأسرع", en: "Suggest closer / faster alternatives" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "BellRing",
-        name: { ar: "التأكيد والتذكيرات", en: "Confirmation & reminders" },
+        id: uid(),
+        icon: "FileCheck",
+        name: { ar: "عرض الشهادة والطباعة", en: "View & print certificate" },
         sla: { ar: "فوري", en: "Instant" },
         sentiment: "delighted",
         emotionScore: 2,
-        touchpoints: [
-          { id: id(), label: { ar: "رسالة نصية", en: "SMS" } },
-          { id: id(), label: { ar: "إشعار تطبيق", en: "Push notification" } },
-          { id: id(), label: { ar: "بريد إلكتروني", en: "Email" } },
-        ],
+        touchpoints: [{ id: uid(), label: { ar: "البوابة الإلكترونية", en: "Online portal" } }],
         actions: [
-          { id: id(), label: { ar: "حفظ الموعد في التقويم", en: "Saves appointment to calendar" } },
-          { id: id(), label: { ar: "مشاركة الموعد مع المرافق", en: "Shares with companion" } },
+          { id: uid(), label: { ar: "تأكيد البيانات الظاهرة", en: "Confirm displayed details" } },
+          { id: uid(), label: { ar: "تنزيل أو طباعة الشهادة", en: "Download or print certificate" } },
         ],
-        entities: [
-          { id: id(), label: { ar: "منصة الإشعارات الحكومية", en: "Government notification platform" } },
-        ],
+        entities: [{ id: uid(), label: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" } }],
         opportunities: [
-          { id: id(), label: { ar: "تذكير ذكي قبل الموعد بساعة", en: "Smart 1-hour reminder" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "ClipboardList",
-        name: { ar: "التحضير قبل الزيارة", en: "Pre-visit preparation" },
-        sla: { ar: "١ إلى ٣ أيام", en: "1 to 3 days" },
-        sentiment: "neutral",
-        emotionScore: 0,
-        touchpoints: [
-          { id: id(), label: { ar: "تطبيق صحتي", en: "Sehhaty app" } },
-          { id: id(), label: { ar: "روابط معرفية", en: "KB articles" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "قراءة تعليمات الصيام أو التحضير", en: "Reads fasting / prep guidance" } },
-          { id: id(), label: { ar: "تحميل الوصفات السابقة", en: "Uploads previous prescriptions" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وزارة الصحة", en: "Ministry of Health" } },
-          { id: id(), label: { ar: "المنشأة الصحية", en: "Healthcare facility" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "قائمة تحضير مخصصة حسب نوع الزيارة", en: "Visit-type specific prep checklist" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "HeartPulse",
-        name: { ar: "إتمام الزيارة واستبيان المتابعة", en: "Visit completion & follow-up survey" },
-        sla: { ar: "نفس اليوم", en: "Same day" },
-        sentiment: "satisfied",
-        emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "زيارة فعلية", en: "In-person visit" } },
-          { id: id(), label: { ar: "استبيان رضا", en: "CSAT survey" } },
-          { id: id(), label: { ar: "ملف صحتي", en: "Sehhaty file" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "إتمام الفحص", en: "Completes consultation" } },
-          { id: id(), label: { ar: "استلام الوصفة الطبية", en: "Receives prescription" } },
-          { id: id(), label: { ar: "تعبئة استبيان رضا قصير", en: "Fills short CSAT survey" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "الطبيب المعالج", en: "Treating physician" } },
-          { id: id(), label: { ar: "وحدة الجودة بالمنشأة", en: "Facility quality unit" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "حلقة مغلقة فورية للحالات السلبية", en: "Instant closed-loop for negative survey" } },
-          { id: id(), label: { ar: "ربط الوصفة بالصيدلية المنزلية", en: "Link prescription to home pharmacy" } },
+          { id: uid(), label: { ar: "ربط API مع الجهات الحكومية للتحقق التلقائي", en: "API hook for govt verification" } },
         ],
       },
     ],
   },
 
-  // ---------- 2. Driver License Renewal ----------
+  // ───────────────────────── 4. NOC for Additional Car Dealership ─────────────────────────
   {
-    id: "j-license",
+    id: "j-gac-car-dealership",
     icon: "Car",
-    title: { ar: "رحلة تجديد رخصة القيادة", en: "Driver License Renewal Journey" },
-    subtitle: {
-      ar: "تجديد رخصة قيادة سارية أو منتهية الصلاحية",
-      en: "Renew a valid or expired driver license end-to-end",
+    title: {
+      ar: "طلب شهادة عدم ممانعة لتسجيل وكالة سيارات إضافية",
+      en: "NOC for Additional Car Dealership Registration",
     },
-    owner: { ar: "الإدارة العامة للمرور", en: "General Department of Traffic" },
-    types: [
-      { ar: "تجديد إلكتروني", en: "Online renewal" },
-      { ar: "تجديد بزيارة المرور", en: "In-person renewal" },
-      { ar: "تجديد مع مخالفات", en: "Renewal with violations" },
-    ],
+    subtitle: {
+      ar: "موافقة الهيئة على تسجيل وكالة سيارات إضافية أو نقل وكالة قائمة",
+      en: "GAC approval to register an additional dealership or transfer a car agency",
+    },
+    owner: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" },
+    types: [{ ar: "وكالة جديدة", en: "New dealership" }, { ar: "نقل وكالة قائمة", en: "Agency transfer" }],
     outcomes: [
-      { ar: "تم التجديد", en: "Renewed" },
-      { ar: "بحاجة إلى سداد مخالفات", en: "Violation settlement required" },
-      { ar: "رفض لعدم اللياقة الطبية", en: "Rejected — medical fitness" },
+      { ar: "موافقة", en: "Approved" },
+      { ar: "موافقة مشروطة", en: "Conditional approval" },
+      { ar: "رفض", en: "Rejected" },
     ],
     stages: [
+      nafathStage(),
       {
-        id: id(),
-        icon: "ListChecks",
-        name: { ar: "التحقق من الأهلية", en: "Eligibility check" },
-        sla: { ar: "فوري", en: "Instant" },
-        sentiment: "neutral",
-        emotionScore: 0,
-        touchpoints: [
-          { id: id(), label: { ar: "تطبيق أبشر أفراد", en: "Absher Individuals app" } },
-          { id: id(), label: { ar: "بوابة المرور", en: "Traffic portal" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "اختيار خدمة تجديد رخصة القيادة", en: "Selects renewal service" } },
-          { id: id(), label: { ar: "مراجعة المتطلبات", en: "Reviews requirements" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "الإدارة العامة للمرور", en: "General Department of Traffic" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "تنبيه استباقي قبل ٩٠ يوماً من الانتهاء", en: "Proactive 90-day pre-expiry alert" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "ShieldCheck",
-        name: { ar: "التحقق عبر نفاذ", en: "Authentication via Nafath" },
-        sla: { ar: "فوري", en: "Instant" },
-        sentiment: "neutral",
-        emotionScore: 0,
-        touchpoints: [
-          { id: id(), label: { ar: "نفاذ", en: "Nafath" } },
-          { id: id(), label: { ar: "أبشر", en: "Absher" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "الموافقة على طلب الدخول", en: "Approves sign-in request" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "هيئة الحكومة الرقمية", en: "Digital Government Authority" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "تكامل بصمة الوجه عبر توكلنا", en: "Face-ID integration via Tawakkalna" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "Wallet",
-        name: { ar: "دفع الرسوم", en: "Fee payment" },
-        sla: { ar: "فوري", en: "Instant" },
-        sentiment: "satisfied",
-        emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "سداد", en: "SADAD" } },
-          { id: id(), label: { ar: "مدى", en: "Mada" } },
-          { id: id(), label: { ar: "أبل باي", en: "Apple Pay" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "اختيار وسيلة الدفع", en: "Picks payment method" } },
-          { id: id(), label: { ar: "تأكيد عملية السداد", en: "Confirms payment" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "البنك المركزي السعودي", en: "Saudi Central Bank" } },
-          { id: id(), label: { ar: "الإدارة العامة للمرور", en: "General Department of Traffic" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "حفظ بطاقة افتراضية للتجديدات المستقبلية", en: "Save default card for future renewals" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "Activity",
-        name: { ar: "التحقق من اللياقة الطبية", en: "Medical fitness verification" },
-        sla: { ar: "يوم عمل واحد", en: "1 work day" },
-        sentiment: "confused",
-        emotionScore: -1,
-        touchpoints: [
-          { id: id(), label: { ar: "مركز فحص طبي معتمد", en: "Accredited medical centre" } },
-          { id: id(), label: { ar: "ربط آلي بأبشر", en: "Auto-link to Absher" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "زيارة مركز الفحص", en: "Visits medical centre" } },
-          { id: id(), label: { ar: "اجتياز فحص النظر", en: "Completes vision test" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وزارة الصحة", en: "Ministry of Health" } },
-          { id: id(), label: { ar: "المركز الطبي المعتمد", en: "Accredited centre" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "كشف لياقة عن بُعد بالكاميرا", en: "Remote camera-based vision check" } },
-          { id: id(), label: { ar: "حجز موعد فحص داخل نفس التدفق", en: "Book medical slot in same flow" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "BadgeCheck",
-        name: { ar: "إصدار الرخصة وتسليمها", en: "License issuance & delivery" },
-        sla: { ar: "ثلاثة أيام عمل", en: "3 work days" },
-        sentiment: "delighted",
-        emotionScore: 2,
-        touchpoints: [
-          { id: id(), label: { ar: "رخصة رقمية في توكلنا", en: "Digital license in Tawakkalna" } },
-          { id: id(), label: { ar: "البريد السعودي سبل", en: "Saudi Post — SPL" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "استعراض الرخصة الرقمية", en: "Views digital license" } },
-          { id: id(), label: { ar: "متابعة شحن النسخة الفعلية", en: "Tracks physical card shipment" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "الإدارة العامة للمرور", en: "General Department of Traffic" } },
-          { id: id(), label: { ar: "البريد السعودي", en: "Saudi Post" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "خيار الاستلام الفوري من المراكز", en: "Same-day pickup from service centres" } },
-        ],
-      },
-    ],
-  },
-
-  // ---------- 3. Business Registration ----------
-  {
-    id: "j-business",
-    icon: "Building2",
-    title: { ar: "رحلة تأسيس المنشأة التجارية", en: "Business Registration Journey" },
-    subtitle: {
-      ar: "من حجز الاسم التجاري إلى الرخصة التشغيلية",
-      en: "From trade name reservation to operating license",
-    },
-    owner: { ar: "وزارة التجارة", en: "Ministry of Commerce" },
-    types: [
-      { ar: "مؤسسة فردية", en: "Sole proprietorship" },
-      { ar: "شركة ذات مسؤولية محدودة", en: "LLC" },
-      { ar: "فرع لشركة أجنبية", en: "Foreign subsidiary" },
-    ],
-    outcomes: [
-      { ar: "سجل تجاري صادر", en: "Registration issued" },
-      { ar: "بحاجة إلى مستندات إضافية", en: "Additional documents required" },
-      { ar: "رفض الطلب", en: "Application rejected" },
-    ],
-    stages: [
-      {
-        id: id(),
-        icon: "Tag",
-        name: { ar: "حجز الاسم التجاري", en: "Trade name reservation" },
-        sla: { ar: "فوري", en: "Instant" },
-        sentiment: "satisfied",
-        emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "منصة وزارة التجارة", en: "Ministry of Commerce portal" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "اقتراح أسماء بديلة", en: "Proposes alternative names" } },
-          { id: id(), label: { ar: "اختيار النشاط الرئيسي", en: "Picks primary activity" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وزارة التجارة", en: "Ministry of Commerce" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "فحص ذكي للأسماء المتاحة لحظياً", en: "Real-time AI name availability check" } },
-        ],
-      },
-      {
-        id: id(),
+        id: uid(),
         icon: "FileText",
-        name: { ar: "صياغة عقد التأسيس", en: "Articles of association" },
-        sla: { ar: "يومان عمل", en: "2 work days" },
-        sentiment: "confused",
-        emotionScore: -1,
-        touchpoints: [
-          { id: id(), label: { ar: "نموذج إلكتروني", en: "Online builder" } },
-          { id: id(), label: { ar: "محامٍ معتمد (اختياري)", en: "Authorised lawyer (optional)" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "إدخال بيانات الشركاء", en: "Enters partner details" } },
-          { id: id(), label: { ar: "تحديد رأس المال وحصص الشركاء", en: "Sets capital and shares" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وزارة التجارة", en: "Ministry of Commerce" } },
-          { id: id(), label: { ar: "هيئة المحامين السعودية", en: "Saudi Bar Association" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "قوالب جاهزة لكل نوع نشاط", en: "Activity-specific document templates" } },
-          { id: id(), label: { ar: "مساعد ذكي لمراجعة البنود", en: "AI clause review assistant" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "Stamp",
-        name: { ar: "التوثيق الإلكتروني", en: "Electronic authentication" },
-        sla: { ar: "نفس اليوم", en: "Same day" },
+        name: { ar: "تجهيز ملف الوكالة", en: "Prepare dealership file" },
+        sla: { ar: "وتيرة المقدم", en: "Applicant-paced" },
         sentiment: "neutral",
         emotionScore: 0,
-        touchpoints: [
-          { id: id(), label: { ar: "بوابة التوثيق", en: "Authentication portal" } },
-          { id: id(), label: { ar: "نفاذ لكافة الشركاء", en: "Nafath for all partners" } },
-        ],
+        touchpoints: [{ id: uid(), label: { ar: "نموذج الطلب", en: "Application form" } }],
         actions: [
-          { id: id(), label: { ar: "توقيع رقمي من كل الشركاء", en: "Digital signature by all partners" } },
+          { id: uid(), label: { ar: "إدخال بيانات الوكالة والصانع", en: "Enter dealer & OEM details" } },
+          { id: uid(), label: { ar: "رفع عقد الوكالة", en: "Upload agency contract" } },
         ],
         entities: [
-          { id: id(), label: { ar: "وزارة العدل", en: "Ministry of Justice" } },
+          { id: uid(), label: { ar: "الإدارة العامة للتراخيص", en: "Authorisations Directorate" } },
+          { id: uid(), label: { ar: "صانع السيارات", en: "OEM" } },
         ],
         opportunities: [
-          { id: id(), label: { ar: "تتبع توقيعات الشركاء في الوقت الفعلي", en: "Real-time partner signature tracking" } },
+          { id: uid(), label: { ar: "ربط آلي بسجلات وزارة التجارة", en: "Auto-link to MoCI registry" } },
         ],
       },
       {
-        id: id(),
-        icon: "Banknote",
-        name: { ar: "إيداع رأس المال", en: "Capital deposit" },
-        sla: { ar: "يوم عمل واحد", en: "1 work day" },
+        id: uid(),
+        icon: "Search",
+        name: { ar: "الدراسة الفنية", en: "Technical review" },
+        sla: { ar: "حتى ٩٠ يوماً", en: "Up to 90 days" },
         sentiment: "neutral",
         emotionScore: 0,
-        touchpoints: [
-          { id: id(), label: { ar: "بنك تجاري معتمد", en: "Authorised commercial bank" } },
-          { id: id(), label: { ar: "خطاب البنك", en: "Bank confirmation letter" } },
-        ],
+        touchpoints: [{ id: uid(), label: { ar: "بوابة المنافسة", en: "GAC e-portal" } }],
         actions: [
-          { id: id(), label: { ar: "فتح حساب بنكي للشركة", en: "Opens corporate bank account" } },
-          { id: id(), label: { ar: "تحويل رأس المال المطلوب", en: "Deposits required capital" } },
+          { id: uid(), label: { ar: "الرد على طلبات الاستكمال خلال ١٤ يوماً", en: "Respond to RFIs within 14 days" } },
         ],
-        entities: [
-          { id: id(), label: { ar: "البنك المركزي السعودي", en: "Saudi Central Bank" } },
-          { id: id(), label: { ar: "البنك التجاري", en: "Commercial bank" } },
-        ],
+        entities: [{ id: uid(), label: { ar: "لجنة الفحص", en: "Review committee" } }],
         opportunities: [
-          { id: id(), label: { ar: "ربط فوري بحساب البنك إلكترونياً", en: "Instant electronic bank linkage" } },
+          { id: uid(), label: { ar: "مؤشّر شفافية لحظي على مرحلة الفحص", en: "Live transparency indicator on review stage" } },
         ],
       },
-      {
-        id: id(),
-        icon: "ScrollText",
-        name: { ar: "إصدار السجل التجاري", en: "Commercial registration" },
-        sla: { ar: "يوم عمل واحد", en: "1 work day" },
-        sentiment: "delighted",
-        emotionScore: 2,
-        touchpoints: [
-          { id: id(), label: { ar: "وزارة التجارة", en: "Ministry of Commerce" } },
-          { id: id(), label: { ar: "إشعار في تطبيق المنشأة", en: "Establishment app notification" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "تنزيل السجل التجاري", en: "Downloads CR certificate" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وزارة التجارة", en: "Ministry of Commerce" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "إصدار رقم السجل خلال دقائق", en: "CR number issued within minutes" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "Users",
-        name: { ar: "التسجيل في الغرفة التجارية", en: "Chamber of commerce registration" },
-        sla: { ar: "يوم عمل واحد", en: "1 work day" },
-        sentiment: "satisfied",
-        emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "بوابة اتحاد الغرف السعودية", en: "Saudi Chambers Federation portal" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "اختيار فئة العضوية", en: "Selects membership tier" } },
-          { id: id(), label: { ar: "سداد رسوم العضوية", en: "Pays membership fee" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "اتحاد الغرف السعودية", en: "Federation of Saudi Chambers" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "تسجيل تلقائي بناءً على نوع النشاط", en: "Auto-enroll by activity type" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "Building",
-        name: { ar: "إصدار الرخصة التشغيلية", en: "Operating license" },
-        sla: { ar: "خمسة أيام عمل", en: "5 work days" },
-        sentiment: "satisfied",
-        emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "أمانة المنطقة", en: "Municipality" } },
-          { id: id(), label: { ar: "بلدي", en: "Balady platform" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "رفع مخطط الموقع", en: "Uploads site plan" } },
-          { id: id(), label: { ar: "حجز موعد كشف ميداني", en: "Books site inspection" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وزارة الشؤون البلدية", en: "Ministry of Municipal Affairs" } },
-          { id: id(), label: { ar: "الدفاع المدني", en: "Civil Defense" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "كشف افتراضي بالفيديو للنشاطات منخفضة المخاطر", en: "Virtual video inspection for low-risk activities" } },
-        ],
-      },
+      ackStage("خلال ٩٠ يوماً", "Within 90 days"),
     ],
   },
 
-  // ---------- 4. Citizen Complaint Resolution ----------
+  // ───────────────────────── 5. Complaint Against Violating Establishment ─────────────────────────
   {
-    id: "j-complaint",
+    id: "j-gac-anticompetitive-complaint",
     icon: "MessageSquareWarning",
-    title: { ar: "رحلة معالجة شكوى المستفيد", en: "Citizen Complaint Resolution Journey" },
+    title: { ar: "تقديم شكوى ضد منشأة مخالفة", en: "Complaint Against a Violating Establishment" },
     subtitle: {
-      ar: "من تقديم الشكوى إلى الإغلاق المعرفي والتعلّم المؤسسي",
-      en: "From submission through resolution to closed-loop learning",
+      ar: "الإبلاغ عن ممارسات مخلّة بالمنافسة كالاتفاقات السرّية وإساءة استخدام الوضع المهيمن",
+      en: "Report anti-competitive practices such as cartels and abuse of dominance",
     },
-    owner: { ar: "منصة تجربة المستفيد · حكومي", en: "CX Platform · cross-government" },
+    owner: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" },
     types: [
-      { ar: "شكوى متعلقة بالخدمة", en: "Service-related" },
-      { ar: "شكوى متعلقة بالجودة", en: "Quality-related" },
-      { ar: "شكوى متعلقة بالموظف", en: "Staff-related" },
+      { ar: "اتفاق مخل بالمنافسة", en: "Anti-competitive agreement" },
+      { ar: "إساءة استخدام مركز مهيمن", en: "Abuse of dominance" },
+      { ar: "تثبيت أسعار", en: "Price fixing" },
     ],
     outcomes: [
-      { ar: "تم الحل", en: "Resolved" },
-      { ar: "مُصعّدة", en: "Escalated" },
-      { ar: "مغلقة بدون حل", en: "Closed without resolution" },
+      { ar: "إحالة للجنة المخالفات", en: "Referred to violations committee" },
+      { ar: "حفظ الشكوى", en: "Complaint dismissed" },
+      { ar: "تسوية", en: "Settled" },
     ],
     stages: [
+      nafathStage(),
       {
-        id: id(),
-        icon: "MessageSquarePlus",
-        name: { ar: "تقديم الشكوى", en: "Submission" },
-        sla: { ar: "مُعتمد على المستفيد", en: "Customer-paced" },
+        id: uid(),
+        icon: "PencilLine",
+        name: { ar: "وصف المخالفة", en: "Describe the violation" },
+        sla: { ar: "وتيرة المشتكي", en: "Complainant-paced" },
         sentiment: "frustrated",
         emotionScore: -2,
-        touchpoints: [
-          { id: id(), label: { ar: "بوابة المستفيد", en: "Citizen portal" } },
-          { id: id(), label: { ar: "واتساب الجهة", en: "WhatsApp channel" } },
-          { id: id(), label: { ar: "تطبيق الجوال", en: "Mobile app" } },
-        ],
+        touchpoints: [{ id: uid(), label: { ar: "نموذج الشكوى الإلكتروني", en: "Online complaint form" } }],
         actions: [
-          { id: id(), label: { ar: "كتابة وصف المشكلة", en: "Describes the issue" } },
-          { id: id(), label: { ar: "إرفاق صور أو وثائق", en: "Attaches photos / docs" } },
+          { id: uid(), label: { ar: "اختيار نوع الممارسة المخلة", en: "Choose violation type" } },
+          { id: uid(), label: { ar: "تحديد المنشأة محل الشكوى", en: "Identify the establishment" } },
+          { id: uid(), label: { ar: "رفع الأدلة والمستندات", en: "Upload evidence" } },
         ],
-        entities: [
-          { id: id(), label: { ar: "وحدة استقبال الشكاوى", en: "Complaints intake unit" } },
-        ],
+        entities: [{ id: uid(), label: { ar: "إدارة استقبال البلاغات", en: "Complaints intake unit" } }],
         opportunities: [
-          { id: id(), label: { ar: "نموذج ذكي يقترح الفئة تلقائياً", en: "AI auto-categorisation form" } },
-          { id: id(), label: { ar: "كشف العاطفة عند الكتابة", en: "Sentiment cue while typing" } },
+          { id: uid(), label: { ar: "إخفاء هوية المبلّغ بشكل آمن", en: "Secure anonymous reporting" } },
+          { id: uid(), label: { ar: "مساعد ذكي لاختيار التصنيف الصحيح", en: "AI assistant for correct classification" } },
         ],
       },
       {
-        id: id(),
-        icon: "MailCheck",
-        name: { ar: "إقرار الاستلام", en: "Acknowledgement" },
-        sla: { ar: "خلال ١٥ دقيقة", en: "Within 15 minutes" },
-        sentiment: "confused",
-        emotionScore: -1,
-        touchpoints: [
-          { id: id(), label: { ar: "رسالة نصية", en: "SMS" } },
-          { id: id(), label: { ar: "إشعار البوابة", en: "Portal notification" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "استلام رقم المرجع", en: "Receives reference number" } },
-          { id: id(), label: { ar: "تأكيد تفاصيل التواصل", en: "Confirms contact details" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "منصة الشكاوى المركزية", en: "Central complaints platform" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "إقرار صوتي شخصي بدلاً من نص آلي", en: "Personalised voice acknowledgement" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "SearchCheck",
-        name: { ar: "التحقيق", en: "Investigation" },
-        sla: { ar: "ثلاثة أيام عمل", en: "3 work days" },
+        id: uid(),
+        icon: "Search",
+        name: { ar: "التحقيق والمعالجة", en: "Investigation & handling" },
+        sla: { ar: "حتى ١٨٠ يوماً", en: "Up to 180 days" },
         sentiment: "neutral",
         emotionScore: 0,
         touchpoints: [
-          { id: id(), label: { ar: "اتصال هاتفي", en: "Phone call" } },
-          { id: id(), label: { ar: "بريد متابعة", en: "Follow-up email" } },
+          { id: uid(), label: { ar: "غرفة بيانات التحقيق", en: "Investigation data room" } },
+          { id: uid(), label: { ar: "اتصال هاتفي من المحقق", en: "Investigator phone call" } },
         ],
         actions: [
-          { id: id(), label: { ar: "الرد على استفسارات الباحث", en: "Responds to investigator queries" } },
-          { id: id(), label: { ar: "تقديم مستندات إضافية", en: "Provides extra documentation" } },
+          { id: uid(), label: { ar: "تزويد المحققين بأي بيانات إضافية", en: "Provide additional info to investigators" } },
         ],
         entities: [
-          { id: id(), label: { ar: "الإدارة المعنية", en: "Responsible department" } },
-          { id: id(), label: { ar: "وحدة الجودة", en: "Quality unit" } },
+          { id: uid(), label: { ar: "إدارة التحقيقات", en: "Investigations Directorate" } },
+          { id: uid(), label: { ar: "لجنة المخالفات", en: "Violations committee" } },
         ],
         opportunities: [
-          { id: id(), label: { ar: "نقاط مرئية لمسار التقدم", en: "Visible progress milestones" } },
+          { id: uid(), label: { ar: "حالة لحظية للشكوى مع جدول زمني", en: "Live status with timeline" } },
+        ],
+      },
+      ackStage("خلال ١٨٠ يوماً", "Within 180 days"),
+    ],
+  },
+
+  // ───────────────────────── 6. Report Internal GAC Violations ─────────────────────────
+  {
+    id: "j-gac-internal-integrity",
+    icon: "ShieldAlert",
+    title: {
+      ar: "الإبلاغ عن المخالفات المالية والإدارية في الهيئة",
+      en: "Report Financial & Administrative Violations within GAC",
+    },
+    subtitle: {
+      ar: "قناة آمنة للإبلاغ عن سلوك مخالف يصدر عن أيٍّ من منسوبي الهيئة",
+      en: "A safe channel to report misconduct by any GAC staff member",
+    },
+    owner: { ar: "وحدة النزاهة - الهيئة العامة للمنافسة", en: "GAC Integrity Unit" },
+    types: [
+      { ar: "مخالفة مالية", en: "Financial violation" },
+      { ar: "مخالفة إدارية", en: "Administrative violation" },
+      { ar: "تعارض مصالح", en: "Conflict of interest" },
+    ],
+    outcomes: [
+      { ar: "إحالة للتحقيق الداخلي", en: "Referred to internal audit" },
+      { ar: "إجراء تأديبي", en: "Disciplinary action" },
+      { ar: "حفظ", en: "Closed" },
+    ],
+    stages: [
+      {
+        id: uid(),
+        icon: "DoorOpen",
+        name: { ar: "فتح القناة الآمنة", en: "Open the secure channel" },
+        sla: { ar: "فوري", en: "Instant" },
+        sentiment: "neutral",
+        emotionScore: 0,
+        touchpoints: [
+          { id: uid(), label: { ar: "بوابة بلاغات النزاهة", en: "Integrity reporting portal" } },
+        ],
+        actions: [
+          { id: uid(), label: { ar: "اختيار البلاغ المُسمَّى أو المجهول", en: "Choose named or anonymous" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "وحدة النزاهة", en: "Integrity Unit" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "تشفير من طرف إلى طرف", en: "End-to-end encryption" } },
         ],
       },
       {
-        id: id(),
-        icon: "Lightbulb",
-        name: { ar: "اقتراح الحل", en: "Resolution proposal" },
-        sla: { ar: "خمسة أيام عمل", en: "5 work days" },
+        id: uid(),
+        icon: "FileWarning",
+        name: { ar: "تفاصيل المخالفة", en: "Violation details" },
+        sla: { ar: "وتيرة المبلّغ", en: "Reporter-paced" },
+        sentiment: "confused",
+        emotionScore: -1,
+        touchpoints: [{ id: uid(), label: { ar: "نموذج البلاغ", en: "Reporting form" } }],
+        actions: [
+          { id: uid(), label: { ar: "وصف الواقعة والشخص المعنيّ", en: "Describe incident & person" } },
+          { id: uid(), label: { ar: "إرفاق أدلة (اختياري)", en: "Attach evidence (optional)" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "وحدة النزاهة", en: "Integrity Unit" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "تذكير ذاتي حول حقوق المبلّغ", en: "Built-in reminder of reporter rights" } },
+        ],
+      },
+      {
+        id: uid(),
+        icon: "ShieldCheck",
+        name: { ar: "التحقيق والإحالة", en: "Investigation & escalation" },
+        sla: { ar: "بحسب الحالة", en: "Case-dependent" },
         sentiment: "satisfied",
         emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "بوابة المستفيد", en: "Citizen portal" } },
-          { id: id(), label: { ar: "اتصال هاتفي", en: "Phone call" } },
-        ],
+        touchpoints: [{ id: uid(), label: { ar: "إشعارات آمنة", en: "Secure notifications" } }],
         actions: [
-          { id: id(), label: { ar: "مراجعة الحل المقترح", en: "Reviews proposed solution" } },
-          { id: id(), label: { ar: "الموافقة أو طلب إعادة النظر", en: "Approves or requests review" } },
+          { id: uid(), label: { ar: "متابعة حالة البلاغ", en: "Track report status" } },
         ],
         entities: [
-          { id: id(), label: { ar: "مسؤول الحالة", en: "Case owner" } },
+          { id: uid(), label: { ar: "إدارة التدقيق الداخلي", en: "Internal Audit" } },
+          { id: uid(), label: { ar: "هيئة الرقابة ومكافحة الفساد", en: "Oversight & Anti-Corruption Authority" } },
         ],
         opportunities: [
-          { id: id(), label: { ar: "خيارات حل متعددة للاختيار", en: "Multiple resolution options to pick from" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "Smile",
-        name: { ar: "رأي المستفيد بعد الحل", en: "Customer feedback" },
-        sla: { ar: "يوم عمل واحد", en: "1 work day" },
-        sentiment: "satisfied",
-        emotionScore: 1,
-        touchpoints: [
-          { id: id(), label: { ar: "استبيان قصير", en: "Micro-survey" } },
-          { id: id(), label: { ar: "رسالة نصية", en: "SMS" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "تقييم التجربة", en: "Rates experience" } },
-          { id: id(), label: { ar: "كتابة ملاحظة حرة", en: "Leaves free-text feedback" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وحدة صوت المستفيد", en: "Voice-of-Customer team" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "استبيان متكيف حسب نوع الحالة", en: "Case-type adaptive survey" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "BookOpen",
-        name: { ar: "الإغلاق والتعلم المؤسسي", en: "Closure & learning" },
-        sla: { ar: "أسبوع عمل", en: "1 work week" },
-        sentiment: "delighted",
-        emotionScore: 2,
-        touchpoints: [
-          { id: id(), label: { ar: "قاعدة المعرفة الداخلية", en: "Internal knowledge base" } },
-          { id: id(), label: { ar: "لقاء استعراض الجودة", en: "Quality review meeting" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "إغلاق الحالة في المنصة", en: "Closes case in platform" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وحدة الجودة", en: "Quality unit" } },
-          { id: id(), label: { ar: "إدارة التحسين المستمر", en: "Continuous improvement office" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "ربط الحالة بمقالات معرفية تلقائياً", en: "Auto-link case to KB articles" } },
-          { id: id(), label: { ar: "تحويل الأنماط المتكررة إلى تحسينات منهجية", en: "Convert recurring patterns into systemic fixes" } },
+          { id: uid(), label: { ar: "حماية واضحة لمن يبلّغ بحسن نية", en: "Clear protection for good-faith reporters" } },
         ],
       },
     ],
   },
 
-  // ---------- 5. School Enrollment ----------
+  // ───────────────────────── 7. Exemption Request ─────────────────────────
   {
-    id: "j-school",
-    icon: "GraduationCap",
-    title: { ar: "رحلة تسجيل الطالب في المدرسة", en: "School Enrollment Journey" },
-    subtitle: {
-      ar: "من فحص الأهلية حتى اليوم الأول للطالب",
-      en: "From eligibility check to the student's first day",
+    id: "j-gac-exemption-request",
+    icon: "FileBadge",
+    title: {
+      ar: "طلب الإعفاء من تطبيق النظام",
+      en: "Exemption Request from Competition Law Provisions",
     },
-    owner: { ar: "وزارة التعليم", en: "Ministry of Education" },
+    subtitle: {
+      ar: "طلب إعفاء من تطبيق المواد ٥ أو ٦ أو ٧ من نظام المنافسة عند تحقّق منافع اقتصادية صافية",
+      en: "Request a Board exemption from Articles 5, 6 or 7 of the Competition Law where net economic benefits exist",
+    },
+    owner: { ar: "مجلس إدارة الهيئة", en: "GAC Board of Directors" },
     types: [
-      { ar: "مدرسة حكومية", en: "Public school" },
-      { ar: "مدرسة أهلية", en: "Private school" },
-      { ar: "مدرسة عالمية", en: "International school" },
-      { ar: "تحويل بين المدارس", en: "Transfer" },
+      { ar: "المادة ٥ — اتفاقات", en: "Article 5 — agreements" },
+      { ar: "المادة ٦ — مركز مهيمن", en: "Article 6 — dominance" },
+      { ar: "المادة ٧ — تركز", en: "Article 7 — concentration" },
     ],
     outcomes: [
-      { ar: "تم القبول", en: "Accepted" },
-      { ar: "قائمة الانتظار", en: "Waitlisted" },
-      { ar: "تحويل إلى مدرسة أخرى", en: "Redirected" },
+      { ar: "إعفاء كامل", en: "Full exemption" },
+      { ar: "إعفاء مشروط", en: "Conditional exemption" },
+      { ar: "رفض", en: "Rejected" },
+    ],
+    stages: [
+      nafathStage(),
+      {
+        id: uid(),
+        icon: "BookOpenCheck",
+        name: { ar: "بناء الحجة الاقتصادية", en: "Build the economic case" },
+        sla: { ar: "وتيرة المقدم", en: "Applicant-paced" },
+        sentiment: "confused",
+        emotionScore: -1,
+        touchpoints: [{ id: uid(), label: { ar: "نموذج طلب الإعفاء", en: "Exemption application form" } }],
+        actions: [
+          { id: uid(), label: { ar: "تحديد المواد المطلوب الإعفاء منها", en: "Identify articles to exempt" } },
+          { id: uid(), label: { ar: "تقديم تحليل المنافع الصافية", en: "Submit net-benefits analysis" } },
+        ],
+        entities: [
+          { id: uid(), label: { ar: "المستشار الاقتصادي", en: "Economic consultant" } },
+          { id: uid(), label: { ar: "إدارة الدراسات الاقتصادية", en: "Economic Studies Dept." } },
+        ],
+        opportunities: [
+          { id: uid(), label: { ar: "قالب موحّد لتحليل المنافع", en: "Standard benefits-analysis template" } },
+        ],
+      },
+      {
+        id: uid(),
+        icon: "Gavel",
+        name: { ar: "اللجنة الفنية ثم المجلس", en: "Technical committee then Board" },
+        sla: { ar: "متعدد المراحل", en: "Multi-stage" },
+        sentiment: "neutral",
+        emotionScore: 0,
+        touchpoints: [
+          { id: uid(), label: { ar: "جلسات استماع", en: "Hearings" } },
+          { id: uid(), label: { ar: "غرفة بيانات الإعفاءات", en: "Exemptions data room" } },
+        ],
+        actions: [
+          { id: uid(), label: { ar: "تقديم توضيحات إضافية عند الطلب", en: "Provide clarifications on request" } },
+        ],
+        entities: [
+          { id: uid(), label: { ar: "اللجنة الفنية للإعفاءات", en: "Technical exemptions committee" } },
+          { id: uid(), label: { ar: "مجلس إدارة الهيئة", en: "GAC Board" } },
+        ],
+        opportunities: [
+          { id: uid(), label: { ar: "جدول زمني واضح لكل مرحلة", en: "Clear timeline per stage" } },
+        ],
+      },
+      ackStage("بحسب قرار المجلس", "Per Board decision"),
+    ],
+  },
+
+  // ───────────────────────── 8. Settlement & Reconciliation ─────────────────────────
+  {
+    id: "j-gac-settlement",
+    icon: "Handshake",
+    title: { ar: "طلب التسوية والمصالحة", en: "Settlement & Reconciliation Request" },
+    subtitle: {
+      ar: "مسار للتسوية أو التساهل عند الإبلاغ المبكر عن الشركاء في المخالفة",
+      en: "Settlement path or leniency for early reporting of co-violators",
+    },
+    owner: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" },
+    types: [
+      { ar: "تسوية مالية", en: "Financial settlement" },
+      { ar: "تساهل (Leniency)", en: "Leniency programme" },
+    ],
+    outcomes: [
+      { ar: "قبول التسوية", en: "Settlement accepted" },
+      { ar: "تخفيف العقوبة", en: "Penalty reduced" },
+      { ar: "رفض", en: "Rejected" },
+    ],
+    stages: [
+      nafathStage(),
+      {
+        id: uid(),
+        icon: "ClipboardSignature",
+        name: { ar: "تقديم العرض", en: "Submit the offer" },
+        sla: { ar: "وتيرة المقدم", en: "Applicant-paced" },
+        sentiment: "frustrated",
+        emotionScore: -2,
+        touchpoints: [{ id: uid(), label: { ar: "نموذج التسوية / التساهل", en: "Settlement / leniency form" } }],
+        actions: [
+          { id: uid(), label: { ar: "وصف المخالفة بشفافية", en: "Disclose violation transparently" } },
+          { id: uid(), label: { ar: "تقديم أدلة على شركاء المخالفة", en: "Provide evidence on co-violators" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "إدارة التسويات", en: "Settlements unit" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "ضمانات سرية صريحة في النظام", en: "Explicit confidentiality safeguards in-system" } },
+        ],
+      },
+      {
+        id: uid(),
+        icon: "Scale",
+        name: { ar: "التفاوض والشروط", en: "Negotiation & terms" },
+        sla: { ar: "بحسب الحالة", en: "Case-dependent" },
+        sentiment: "neutral",
+        emotionScore: 0,
+        touchpoints: [{ id: uid(), label: { ar: "جلسات تفاوض رسمية", en: "Formal negotiation sessions" } }],
+        actions: [
+          { id: uid(), label: { ar: "الاتفاق على الشروط النهائية", en: "Agree final terms" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "لجنة المخالفات", en: "Violations committee" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "محرر شروط مشترك داخل المنصة", en: "In-platform terms editor" } },
+        ],
+      },
+      ackStage("قرار المجلس", "Board decision"),
+    ],
+  },
+
+  // ───────────────────────── 9. Concentration Fee Calculator ─────────────────────────
+  {
+    id: "j-gac-fee-calculator",
+    icon: "Calculator",
+    title: {
+      ar: "حساب المقابل المالي لطلب التركز الاقتصادي",
+      en: "Concentration Fee Calculator",
+    },
+    subtitle: {
+      ar: "تقدير فوري للمقابل المالي بناءً على إجمالي المبيعات السنوية للأطراف",
+      en: "Instant fee estimate based on the combined annual sales of the parties",
+    },
+    owner: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" },
+    types: [{ ar: "حاسبة عامة — دون تسجيل", en: "Public calculator — no login" }],
+    outcomes: [{ ar: "تقدير فوري للرسوم", en: "Instant fee estimate" }],
+    stages: [
+      {
+        id: uid(),
+        icon: "MousePointerClick",
+        name: { ar: "فتح الحاسبة", en: "Open the calculator" },
+        sla: { ar: "فوري", en: "Instant" },
+        sentiment: "neutral",
+        emotionScore: 0,
+        touchpoints: [
+          { id: uid(), label: { ar: "صفحة الحاسبة في البوابة", en: "Calculator page on portal" } },
+        ],
+        actions: [{ id: uid(), label: { ar: "الوصول دون تسجيل دخول", en: "Access without login" } }],
+        entities: [{ id: uid(), label: { ar: "الهيئة العامة للمنافسة", en: "General Authority for Competition" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "حفظ السيناريوهات للمقارنة", en: "Save scenarios for comparison" } },
+        ],
+      },
+      {
+        id: uid(),
+        icon: "Sigma",
+        name: { ar: "إدخال المبيعات", en: "Enter sales figures" },
+        sla: { ar: "فوري", en: "Instant" },
+        sentiment: "satisfied",
+        emotionScore: 1,
+        touchpoints: [{ id: uid(), label: { ar: "حقول مبيعات الأطراف", en: "Party-sales fields" } }],
+        actions: [
+          { id: uid(), label: { ar: "إدخال إجمالي المبيعات السنوية", en: "Enter combined annual sales" } },
+          { id: uid(), label: { ar: "عرض الرسوم المقدرة", en: "View estimated fee" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "نظام الرسوم", en: "Fees engine" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "تنزيل تقدير PDF موقّع رقمياً", en: "Digitally-signed PDF estimate" } },
+        ],
+      },
+      {
+        id: uid(),
+        icon: "ArrowRightCircle",
+        name: { ar: "الانتقال للإبلاغ", en: "Proceed to notification" },
+        sla: { ar: "فوري", en: "Instant" },
+        sentiment: "delighted",
+        emotionScore: 2,
+        touchpoints: [{ id: uid(), label: { ar: "رابط مباشر لخدمة الإبلاغ", en: "Direct link to notification service" } }],
+        actions: [{ id: uid(), label: { ar: "بدء إخطار تركز اقتصادي", en: "Start economic concentration notification" } }],
+        entities: [{ id: uid(), label: { ar: "خدمة الإبلاغ عن التركز", en: "Concentration notification service" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "تعبئة مسبقة من بيانات الحاسبة", en: "Pre-fill from calculator data" } },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────── 10. Scholarship Programme ─────────────────────────
+  {
+    id: "j-gac-scholarship",
+    icon: "GraduationCap",
+    title: { ar: "التقديم على الابتعاث", en: "Scholarship Programme Application" },
+    subtitle: {
+      ar: "ابتعاث الكوادر السعودية في الاقتصاد والمالية والمحاسبة والرياضيات والهندسة الصناعية",
+      en: "Scholarships for Saudi candidates in economics, finance, accounting, mathematics & industrial engineering",
+    },
+    owner: { ar: "إدارة الموارد البشرية - الهيئة العامة للمنافسة", en: "GAC Human Capital" },
+    types: [
+      { ar: "ماجستير", en: "Master's" },
+      { ar: "دكتوراه", en: "PhD" },
+    ],
+    outcomes: [
+      { ar: "قبول مبدئي", en: "Initial acceptance" },
+      { ar: "قبول نهائي", en: "Final acceptance" },
+      { ar: "اعتذار", en: "Decline" },
     ],
     stages: [
       {
-        id: id(),
-        icon: "MapPin",
-        name: { ar: "فحص الأهلية والنطاق الجغرافي", en: "Eligibility & catchment check" },
-        sla: { ar: "فوري", en: "Instant" },
+        id: uid(),
+        icon: "ListChecks",
+        name: { ar: "التحقق من الأهلية", en: "Eligibility check" },
+        sla: { ar: "ذاتي", en: "Self-serve" },
         sentiment: "neutral",
         emotionScore: 0,
-        touchpoints: [
-          { id: id(), label: { ar: "نظام نور", en: "Noor system" } },
-          { id: id(), label: { ar: "تطبيق توكلنا", en: "Tawakkalna" } },
-        ],
+        touchpoints: [{ id: uid(), label: { ar: "صفحة شروط الابتعاث", en: "Eligibility page" } }],
         actions: [
-          { id: id(), label: { ar: "إدخال عنوان السكن الوطني", en: "Enters national address" } },
-          { id: id(), label: { ar: "اختيار المرحلة الدراسية", en: "Picks grade level" } },
+          { id: uid(), label: { ar: "التحقق من الجنسية والمعدل واختبار IELTS", en: "Verify nationality, GPA & IELTS" } },
         ],
-        entities: [
-          { id: id(), label: { ar: "وزارة التعليم", en: "Ministry of Education" } },
-          { id: id(), label: { ar: "العنوان الوطني", en: "National Address" } },
-        ],
+        entities: [{ id: uid(), label: { ar: "إدارة التطوير والابتعاث", en: "L&D and Scholarships unit" } }],
         opportunities: [
-          { id: id(), label: { ar: "خريطة تفاعلية للمدارس المتاحة", en: "Interactive map of available schools" } },
+          { id: uid(), label: { ar: "مدقّق أهلية تفاعلي خلال ٦٠ ثانية", en: "60-second interactive eligibility checker" } },
         ],
       },
+      nafathStage(),
       {
-        id: id(),
-        icon: "Upload",
-        name: { ar: "رفع المستندات", en: "Document upload" },
-        sla: { ar: "مُعتمد على ولي الأمر", en: "Parent-paced" },
+        id: uid(),
+        icon: "UploadCloud",
+        name: { ar: "تقديم الملف الأكاديمي", en: "Submit academic file" },
+        sla: { ar: "حتى موعد الإقفال", en: "Until deadline" },
         sentiment: "confused",
         emotionScore: -1,
-        touchpoints: [
-          { id: id(), label: { ar: "نظام نور", en: "Noor system" } },
-          { id: id(), label: { ar: "أبشر أفراد", en: "Absher Individuals" } },
-        ],
+        touchpoints: [{ id: uid(), label: { ar: "نموذج الابتعاث", en: "Scholarship form" } }],
         actions: [
-          { id: id(), label: { ar: "رفع شهادات سابقة", en: "Uploads previous certificates" } },
-          { id: id(), label: { ar: "رفع تقرير صحي", en: "Uploads health report" } },
+          { id: uid(), label: { ar: "رفع السجل الأكاديمي والشهادات", en: "Upload transcripts & certificates" } },
+          { id: uid(), label: { ar: "رفع نتيجة IELTS وجواز السفر", en: "Upload IELTS and passport" } },
         ],
-        entities: [
-          { id: id(), label: { ar: "وزارة التعليم", en: "Ministry of Education" } },
-          { id: id(), label: { ar: "وزارة الصحة", en: "Ministry of Health" } },
-        ],
+        entities: [{ id: uid(), label: { ar: "إدارة الموارد البشرية", en: "HR department" } }],
         opportunities: [
-          { id: id(), label: { ar: "جلب الوثائق آلياً من الجهات الحكومية", en: "Auto-fetch documents from government sources" } },
+          { id: uid(), label: { ar: "تحقق آلي من معادلة الشهادات", en: "Auto-verify degree equivalency" } },
         ],
       },
       {
-        id: id(),
-        icon: "Shuffle",
-        name: { ar: "الاختيار والمطابقة", en: "Selection & matching" },
-        sla: { ar: "ثلاثة أيام عمل", en: "3 work days" },
-        sentiment: "neutral",
-        emotionScore: 0,
-        touchpoints: [
-          { id: id(), label: { ar: "خوارزمية المطابقة", en: "Matching algorithm" } },
-          { id: id(), label: { ar: "ترشيح الإدارة التعليمية", en: "Education directorate review" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "متابعة حالة الطلب", en: "Monitors application status" } },
-          { id: id(), label: { ar: "ترتيب الخيارات حسب الأفضلية", en: "Ranks preferred schools" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "الإدارة التعليمية بالمنطقة", en: "Regional education directorate" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "شرح شفاف لكيفية المطابقة", en: "Transparent matching explanation" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "BellRing",
-        name: { ar: "إشعار القبول", en: "Acceptance notification" },
-        sla: { ar: "فوري", en: "Instant" },
-        sentiment: "delighted",
-        emotionScore: 2,
-        touchpoints: [
-          { id: id(), label: { ar: "رسالة نصية", en: "SMS" } },
-          { id: id(), label: { ar: "إشعار في نظام نور", en: "Noor notification" } },
-          { id: id(), label: { ar: "بريد إلكتروني", en: "Email" } },
-        ],
-        actions: [
-          { id: id(), label: { ar: "تأكيد قبول المقعد", en: "Confirms seat acceptance" } },
-        ],
-        entities: [
-          { id: id(), label: { ar: "وزارة التعليم", en: "Ministry of Education" } },
-          { id: id(), label: { ar: "المدرسة المُختارة", en: "Assigned school" } },
-        ],
-        opportunities: [
-          { id: id(), label: { ar: "تأكيد بنقرة واحدة من خلال الإشعار", en: "One-tap confirmation from notification" } },
-        ],
-      },
-      {
-        id: id(),
-        icon: "Package",
-        name: { ar: "سداد الرسوم والزي المدرسي", en: "Fees & uniform fulfilment" },
-        sla: { ar: "أسبوع عمل", en: "1 work week" },
+        id: uid(),
+        icon: "Stethoscope",
+        name: { ar: "الفحص الطبي والمفاضلة", en: "Medical & shortlisting" },
+        sla: { ar: "حتى ٢٠ يوم عمل", en: "Up to 20 working days" },
         sentiment: "satisfied",
         emotionScore: 1,
         touchpoints: [
-          { id: id(), label: { ar: "سداد", en: "SADAD" } },
-          { id: id(), label: { ar: "موردي الزي المعتمدون", en: "Approved uniform suppliers" } },
+          { id: uid(), label: { ar: "مركز فحص معتمد", en: "Approved medical centre" } },
+          { id: uid(), label: { ar: "إشعارات البريد والـ SMS", en: "Email / SMS notifications" } },
         ],
         actions: [
-          { id: id(), label: { ar: "اختيار الموردين", en: "Selects supplier" } },
-          { id: id(), label: { ar: "سداد الرسوم", en: "Pays fees" } },
+          { id: uid(), label: { ar: "إكمال الفحص الطبي", en: "Complete medical check" } },
+          { id: uid(), label: { ar: "متابعة نتيجة المفاضلة", en: "Track shortlist outcome" } },
         ],
         entities: [
-          { id: id(), label: { ar: "وزارة التعليم", en: "Ministry of Education" } },
-          { id: id(), label: { ar: "البنوك المحلية", en: "Local banks" } },
+          { id: uid(), label: { ar: "لجنة الابتعاث", en: "Scholarship committee" } },
+          { id: uid(), label: { ar: "وزارة التعليم", en: "Ministry of Education" } },
         ],
         opportunities: [
-          { id: id(), label: { ar: "حزم زي بمقاسات مقترحة آلياً", en: "Auto-sized uniform packages" } },
+          { id: uid(), label: { ar: "جدول زمني تفاعلي للمتقدم", en: "Interactive applicant timeline" } },
+        ],
+      },
+      ackStage("خلال ٢٠ يوم عمل", "Within 20 working days"),
+    ],
+  },
+
+  // ───────────────────────── 11. Training Programme Registration ─────────────────────────
+  {
+    id: "j-gac-training",
+    icon: "BookOpen",
+    title: { ar: "البرامج التدريبية", en: "Training Programme Registration" },
+    subtitle: {
+      ar: "ورش التوعية ببرامج نظام المنافسة للجمهور والقطاع الخاص",
+      en: "Competition-law awareness workshops for the public and private sector",
+    },
+    owner: { ar: "أكاديمية المنافسة - الهيئة العامة للمنافسة", en: "GAC Competition Academy" },
+    types: [
+      { ar: "ورشة افتراضية", en: "Virtual workshop" },
+      { ar: "برنامج حضوري", en: "In-person programme" },
+    ],
+    outcomes: [
+      { ar: "تسجيل مؤكد", en: "Registration confirmed" },
+      { ar: "قائمة انتظار", en: "Waitlisted" },
+    ],
+    stages: [
+      {
+        id: uid(),
+        icon: "LayoutGrid",
+        name: { ar: "تصفّح البرامج", en: "Browse programmes" },
+        sla: { ar: "ذاتي", en: "Self-serve" },
+        sentiment: "satisfied",
+        emotionScore: 1,
+        touchpoints: [{ id: uid(), label: { ar: "كتالوج البرامج", en: "Programme catalogue" } }],
+        actions: [
+          { id: uid(), label: { ar: "تصفية البرامج بالموضوع والتاريخ", en: "Filter by topic & date" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "إدارة التدريب والتطوير", en: "Training & Development" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "توصيات شخصية بناءً على القطاع", en: "Personalised recommendations by sector" } },
         ],
       },
       {
-        id: id(),
-        icon: "Sparkles",
-        name: { ar: "ترحيب اليوم الأول", en: "First-day welcome" },
-        sla: { ar: "اليوم الأول", en: "Day 1" },
+        id: uid(),
+        icon: "UserPlus",
+        name: { ar: "إنشاء الحساب", en: "Create account" },
+        sla: { ar: "فوري", en: "Instant" },
+        sentiment: "neutral",
+        emotionScore: 0,
+        touchpoints: [{ id: uid(), label: { ar: "صفحة التسجيل", en: "Registration page" } }],
+        actions: [
+          { id: uid(), label: { ar: "تأكيد الهوية أو الحساب التجاري", en: "Verify identity or business account" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "نظام إدارة المتدربين", en: "Trainee management system" } }],
+        opportunities: [{ id: uid(), label: { ar: "تسجيل سريع عبر نفاذ", en: "One-tap Nafath signup" } }],
+      },
+      {
+        id: uid(),
+        icon: "Mail",
+        name: { ar: "تأكيد التسجيل والوصول", en: "Confirmation & access" },
+        sla: { ar: "فوري", en: "Instant" },
         sentiment: "delighted",
         emotionScore: 2,
         touchpoints: [
-          { id: id(), label: { ar: "زيارة فعلية", en: "In-person welcome" } },
-          { id: id(), label: { ar: "حقيبة ترحيبية", en: "Welcome kit" } },
+          { id: uid(), label: { ar: "بريد إلكتروني", en: "Email" } },
+          { id: uid(), label: { ar: "تقويم رقمي", en: "Digital calendar" } },
         ],
         actions: [
-          { id: id(), label: { ar: "الالتحاق بالفصل", en: "Joins the classroom" } },
-          { id: id(), label: { ar: "حضور لقاء أولياء الأمور", en: "Attends parent orientation" } },
+          { id: uid(), label: { ar: "إضافة الموعد للتقويم", en: "Add to calendar" } },
+          { id: uid(), label: { ar: "تنزيل المواد التحضيرية", en: "Download pre-reads" } },
         ],
-        entities: [
-          { id: id(), label: { ar: "إدارة المدرسة", en: "School administration" } },
-          { id: id(), label: { ar: "مجلس أولياء الأمور", en: "Parent council" } },
-        ],
+        entities: [{ id: uid(), label: { ar: "أكاديمية المنافسة", en: "Competition Academy" } }],
         opportunities: [
-          { id: id(), label: { ar: "جولة افتراضية قبل اليوم الأول", en: "Virtual tour before day 1" } },
-          { id: id(), label: { ar: "استبيان مزاج بعد أسبوع", en: "1-week mood pulse survey" } },
+          { id: uid(), label: { ar: "شهادة حضور رقمية موقّعة", en: "Digitally-signed attendance certificate" } },
         ],
       },
+    ],
+  },
+
+  // ───────────────────────── 12. Compliance Programme Application ─────────────────────────
+  {
+    id: "j-gac-compliance-programme",
+    icon: "ShieldCheck",
+    title: {
+      ar: "التقديم على برنامج الامتثال",
+      en: "Competition Compliance Programme Application",
+    },
+    subtitle: {
+      ar: "تقييم الهيئة للبرامج الداخلية لامتثال المنشآت لنظام المنافسة",
+      en: "GAC assessment of an organisation's internal Competition-Law compliance programme",
+    },
+    owner: { ar: "إدارة الامتثال - الهيئة العامة للمنافسة", en: "GAC Compliance Office" },
+    types: [
+      { ar: "تقييم أولي", en: "Initial assessment" },
+      { ar: "إعادة تقييم سنوي", en: "Annual re-assessment" },
+    ],
+    outcomes: [
+      { ar: "اعتماد البرنامج", en: "Programme accredited" },
+      { ar: "ملاحظات للتحسين", en: "Improvement notes" },
+      { ar: "رفض", en: "Rejected" },
+    ],
+    stages: [
+      nafathStage(),
+      {
+        id: uid(),
+        icon: "BookText",
+        name: { ar: "تجميع وثائق الامتثال", en: "Compile compliance docs" },
+        sla: { ar: "وتيرة المنشأة", en: "Organisation-paced" },
+        sentiment: "confused",
+        emotionScore: -1,
+        touchpoints: [{ id: uid(), label: { ar: "نموذج الامتثال", en: "Compliance form" } }],
+        actions: [
+          { id: uid(), label: { ar: "رفع دليل الامتثال الداخلي", en: "Upload internal compliance guide" } },
+          { id: uid(), label: { ar: "إثبات تدريب الموظفين", en: "Evidence of staff training" } },
+          { id: uid(), label: { ar: "إثبات تعيين مسؤول الامتثال", en: "Designated compliance officer" } },
+          { id: uid(), label: { ar: "آلية الإبلاغ السري الداخلي", en: "Internal confidential reporting mechanism" } },
+          { id: uid(), label: { ar: "تبعية الإدارة العليا لمسؤول الامتثال", en: "Compliance officer reporting line to senior management" } },
+        ],
+        entities: [
+          { id: uid(), label: { ar: "إدارة الالتزام في المنشأة", en: "Compliance team in organisation" } },
+          { id: uid(), label: { ar: "المراجع الداخلي", en: "Internal auditor" } },
+        ],
+        opportunities: [
+          { id: uid(), label: { ar: "قائمة مرجعية تفاعلية للامتثال", en: "Interactive compliance checklist" } },
+        ],
+      },
+      {
+        id: uid(),
+        icon: "ClipboardCheck",
+        name: { ar: "التقييم الفني", en: "Technical assessment" },
+        sla: { ar: "حتى ٦٠ يوماً", en: "Up to 60 days" },
+        sentiment: "neutral",
+        emotionScore: 0,
+        touchpoints: [
+          { id: uid(), label: { ar: "زيارات تقييمية", en: "Assessment visits" } },
+          { id: uid(), label: { ar: "غرفة بيانات الامتثال", en: "Compliance data room" } },
+        ],
+        actions: [
+          { id: uid(), label: { ar: "الرد على ملاحظات اللجنة", en: "Respond to committee observations" } },
+        ],
+        entities: [{ id: uid(), label: { ar: "لجنة تقييم الامتثال", en: "Compliance review committee" } }],
+        opportunities: [
+          { id: uid(), label: { ar: "تقرير اعتماد إلكتروني بقابلية التحقق", en: "Verifiable e-accreditation report" } },
+        ],
+      },
+      ackStage("خلال ٦٠ يوماً", "Within 60 days"),
     ],
   },
 ];

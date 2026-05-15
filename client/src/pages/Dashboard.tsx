@@ -110,7 +110,7 @@ function Kpi({
     <Card className="shadow-card card-lift">
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+          <p className="eyebrow text-muted-foreground">{label}</p>
           <span
             className={cn(
               "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md ring-1",

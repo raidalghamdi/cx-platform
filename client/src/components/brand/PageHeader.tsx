@@ -8,6 +8,7 @@ export function PageHeader({
   Icon,
   requirementIds,
   standards,
+  eyebrow,
 }: {
   title: string;
   subtitle?: string;
@@ -17,17 +18,24 @@ export function PageHeader({
   requirementIds?: string[];
   /** Optional standards mapped to those REQ-IDs (ISO/DGA/WCAG/EFQM/PDPL/NCA-ECC). */
   standards?: string[];
+  /** Optional ALL-CAPS micro-label rendered above the title (modernized). */
+  eyebrow?: string;
 }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3 pb-5 mb-6 border-b border-border">
       <div className="space-y-1 min-w-0">
+        {eyebrow && (
+          <p className="eyebrow text-muted-foreground" data-testid="page-eyebrow">
+            {eyebrow}
+          </p>
+        )}
         <div className="flex items-center gap-2 flex-wrap">
           <h1
-            className="flex items-center gap-2.5 text-xl font-semibold tracking-tight text-foreground"
+            className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight text-foreground"
             data-testid="page-title"
           >
             {Icon && (
-              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Icon size={18} strokeWidth={2} />
               </span>
             )}
@@ -37,7 +45,7 @@ export function PageHeader({
             <RequirementBadge ids={requirementIds} standards={standards} />
           )}
         </div>
-        {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
     </div>

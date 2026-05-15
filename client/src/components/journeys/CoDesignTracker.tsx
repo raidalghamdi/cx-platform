@@ -1,57 +1,40 @@
+import { useMemo } from "react";
 import { Lightbulb, Users, FlaskConical, Sparkles, CheckCircle2 } from "lucide-react";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useJourneys } from "@/contexts/JourneyContext";
 import { RequirementBadge } from "@/components/brand/RequirementBadge";
 import { cn } from "@/lib/utils";
 
 // Co-Design lifecycle tracker — DGA 5.18.3: beneficiaries participate across
 // Discover → Co-Design → Prototype → Pilot → Adopt for each service journey.
+// Reads live journeys from JourneyContext (Admin/Journeys CRUD propagates here).
 type Stage = "discover" | "co-design" | "prototype" | "pilot" | "adopt";
 
 type JourneyStage = {
-  id: string;          // journey id
+  id: string;          // journey id (short)
+  fullId: string;      // full journey id (for testids)
   title: { ar: string; en: string };
   stage: Stage;
   participants: number;
   lastUpdate: { ar: string; en: string };
 };
 
-const SAMPLE: JourneyStage[] = [
-  {
-    id: "J-001",
-    title: { ar: "إصدار رخصة جديدة", en: "Issue a new licence" },
-    stage: "pilot",
-    participants: 42,
-    lastUpdate: { ar: "تجربة المستفيد — تشغيلية تجريبية", en: "Beneficiary trial — limited live pilot" },
-  },
-  {
-    id: "J-002",
-    title: { ar: "تحديث البيانات الشخصية", en: "Update personal information" },
-    stage: "co-design",
-    participants: 28,
-    lastUpdate: { ar: "ورشة تصميم مشترك مع ١٢ مستفيداً", en: "Co-design workshop with 12 beneficiaries" },
-  },
-  {
-    id: "J-003",
-    title: { ar: "تقديم شكوى", en: "Submit a complaint" },
-    stage: "adopt",
-    participants: 124,
-    lastUpdate: { ar: "تم تبني التصميم رسمياً", en: "Design formally adopted" },
-  },
-  {
-    id: "J-004",
-    title: { ar: "طلب موعد للخدمة", en: "Request a service appointment" },
-    stage: "discover",
-    participants: 18,
-    lastUpdate: { ar: "مقابلات استكشافية", en: "Discovery interviews underway" },
-  },
-  {
-    id: "J-005",
-    title: { ar: "طلب الدعم الاجتماعي", en: "Apply for social support" },
-    stage: "prototype",
-    participants: 36,
-    lastUpdate: { ar: "نموذج أولي للاختبار", en: "Clickable prototype in testing" },
-  },
-];
+const STAGE_ORDER: Stage[] = ["discover", "co-design", "prototype", "pilot", "adopt"];
+
+const STAGE_NOTES: Record<Stage, { ar: string; en: string }> = {
+  discover: { ar: "مقابلات وتحليل احتياجات", en: "Discovery interviews & needs analysis" },
+  "co-design": { ar: "ورشة تصميم مشترك مع المستفيدين", en: "Co-design workshop with beneficiaries" },
+  prototype: { ar: "نموذج أولي للاختبار", en: "Clickable prototype in testing" },
+  pilot: { ar: "تجربة تشغيلية محدودة", en: "Limited live pilot underway" },
+  adopt: { ar: "تم تبني التصميم رسمياً", en: "Design formally adopted" },
+};
+
+// Stable hash so each journey id maps to the same stage on every render.
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
 
 const STAGES: { key: Stage; ar: string; en: string; Icon: typeof Lightbulb; tint: string }[] = [
   { key: "discover", ar: "الاستكشاف", en: "Discover", Icon: Lightbulb, tint: "amber" },
@@ -71,6 +54,26 @@ const TINT_CLS: Record<string, string> = {
 
 export function CoDesignTracker() {
   const { lang } = useLocale();
+  const { journeys } = useJourneys();
+
+  // Derive a deterministic stage + participant count for every live journey.
+  const SAMPLE: JourneyStage[] = useMemo(
+    () =>
+      journeys.map((j, i) => {
+        const stage = STAGE_ORDER[hashStr(j.id + i) % STAGE_ORDER.length];
+        const participants = 18 + (j.stages?.length ?? 0) * 6 + (hashStr(j.id) % 28);
+        const short = j.id.slice(-4).toUpperCase().replace(/[^A-Z0-9]/g, "");
+        return {
+          id: short || `J-${String(i + 1).padStart(3, "0")}`,
+          fullId: j.id,
+          title: j.title,
+          stage,
+          participants,
+          lastUpdate: STAGE_NOTES[stage],
+        };
+      }),
+    [journeys],
+  );
 
   const stageCounts = STAGES.map((s) => ({
     ...s,
@@ -129,12 +132,17 @@ export function CoDesignTracker() {
       </div>
 
       {/* Per-journey list */}
-      <ul className="px-5 pb-4 space-y-2">
+      <ul className="px-5 pb-4 space-y-2 max-h-[460px] overflow-y-auto">
+        {SAMPLE.length === 0 && (
+          <li className="text-[12px] text-muted-foreground py-6 text-center">
+            {lang === "ar" ? "لا توجد رحلات بعد." : "No journeys yet."}
+          </li>
+        )}
         {SAMPLE.map((j) => {
           const stage = STAGES.find((s) => s.key === j.stage)!;
           return (
             <li
-              key={j.id}
+              key={j.fullId}
               className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-border bg-background hover:bg-muted/40 transition-colors"
               data-testid={`codesign-${j.id}`}
             >

@@ -102,8 +102,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex h-16 items-center gap-3 px-5 border-b border-sidebar-border">
           <Logo size={32} />
           <div className="flex flex-col leading-tight">
-            <span className="text-[13px] font-semibold text-foreground">{t("brand.name")}</span>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span className="text-[14px] font-semibold text-foreground tracking-tight">{t("brand.name")}</span>
+            <span className="eyebrow text-muted-foreground">
               {lang === "ar" ? "حكومي" : "Government"}
             </span>
           </div>
@@ -112,7 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <nav className="px-3 py-4 space-y-3 overflow-y-auto max-h-[calc(100vh-10rem)]">
           {visibleGroups.map((group, gi) => (
             <div key={group.titleKey} className={cn(gi > 0 && "pt-2 border-t border-sidebar-border") }>
-              <p className={cn("px-3 pt-1 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground", isRTL && "text-right")}>
+              <p className={cn("eyebrow px-3 pt-1 pb-1.5 text-muted-foreground", isRTL && "text-right")}>
                 {t(group.titleKey)}
               </p>
               <div className="space-y-0.5">
