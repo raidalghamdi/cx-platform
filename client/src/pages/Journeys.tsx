@@ -101,7 +101,7 @@ export default function Journeys() {
           ).size;
           return (
             <Link key={j.id} href={`/journeys/${j.id}`}>
-              <Card className="shadow-card card-lift cursor-pointer group h-full overflow-hidden relative">
+              <Card className="premium-card card-lift cursor-pointer group h-full overflow-hidden relative border-0">
                 <div className="relative h-1.5 bg-gradient-to-r from-primary via-primary/70 to-amber-400/70" />
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3">

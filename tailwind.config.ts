@@ -58,6 +58,21 @@ export default {
           "3": "hsl(var(--chart-3) / <alpha-value>)",
           "4": "hsl(var(--chart-4) / <alpha-value>)",
           "5": "hsl(var(--chart-5) / <alpha-value>)",
+          "6": "hsl(var(--chart-6) / <alpha-value>)",
+        },
+        // Premium surface variants
+        surface: {
+          warm: "hsl(var(--surface-warm) / <alpha-value>)",
+          cream: "hsl(var(--surface-cream) / <alpha-value>)",
+          ivory: "hsl(var(--surface-ivory) / <alpha-value>)",
+        },
+        // Premium earth tones (chart secondaries + status accents)
+        earth: {
+          "dark-brown": "hsl(var(--earth-dark-brown) / <alpha-value>)",
+          "warm-brown": "hsl(var(--earth-warm-brown) / <alpha-value>)",
+          coral: "hsl(var(--earth-coral) / <alpha-value>)",
+          "light-purple": "hsl(var(--earth-light-purple-40) / <alpha-value>)",
+          "light-purple-soft": "hsl(var(--earth-light-purple-20) / <alpha-value>)",
         },
         sidebar: {
           ring: "hsl(var(--sidebar-ring) / <alpha-value>)",
@@ -97,9 +112,10 @@ export default {
         mono: ["var(--font-mono)"],
       },
       boxShadow: {
-        card: "0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px -1px rgb(15 23 42 / 0.06)",
-        "card-hover": "0 4px 6px -2px rgb(15 23 42 / 0.06), 0 8px 12px -4px rgb(15 23 42 / 0.06)",
-        soft: "0 2px 8px -2px rgb(15 23 42 / 0.05)",
+        // Warm-tinted shadows (28deg hue) to match premium editorial palette
+        card: "0 1px 2px 0 hsl(28 30% 20% / 0.04), 0 4px 12px -2px hsl(28 30% 20% / 0.06)",
+        "card-hover": "0 4px 8px -2px hsl(28 30% 20% / 0.07), 0 12px 24px -6px hsl(28 30% 20% / 0.09)",
+        soft: "0 2px 10px -2px hsl(28 30% 20% / 0.05)",
       },
       keyframes: {
         "accordion-down": {

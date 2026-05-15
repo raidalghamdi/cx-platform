@@ -2,16 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CX Platform — DGA Design System v1.1 (modernized within DGA limits)
-   Primary: SA-500 Saudi green #25935F (unchanged, DGA-mandated).
-   Accent: Gold-500 #F8BD02 (unchanged, KSA flag accent).
-   Modernization v1.1 — Alinma-inspired refresh within DGA:
-     • Warm off-white surface #FBFAF7 (alternative to pure white, still WCAG AA)
-     • Generous eyebrow microtype (text-[10px] tracking-widest uppercase)
-     • Softer 6%/4% opacity blue-green tinted shadows
-     • Card radius up to 14px (cards only; buttons remain 8px per DGA)
-     • Hero card to 16px radius (DGA permits up to 16px for hero/large surfaces)
-   Reference: dga_design_system.md */
+/* CX Platform — DGA Design System v2.0 (Premium Enterprise within DGA limits)
+   ============================================================================
+   COLOR RULE — LOCKED:
+     Primary: SA-500 Saudi green #25935F (DGA-mandated, never replaced)
+     Accent:  Gold-500 #F8BD02 (KSA flag accent, never replaced)
+   v2.0 upgrade — Premium Enterprise design system applied EXCEPT colors:
+     • Warm editorial page background #FCF4EF (Light Neutral BG from skill)
+     • Warm surface accent #F9EBE0 for editorial panels (used sparingly)
+     • Layered depth — premium shadow stack with subtle warm tint
+     • Typography rhythm — tighter heading tracking, refined hierarchy
+     • Chart palette extended — earth tones as 3rd/4th/5th categoricals
+         (#C66E4E warm-brown, #FFA38B coral, #CFCCEF light-purple)
+     • New primitives: .premium-card, .editorial-frame, .hairline, .stat-display
+     • Motion — slower, more expressive easing for premium feel
+   Reference: dga_design_system.md + premium-enterprise skill */
 :root {
   --button-outline: rgba(22, 106, 69, 0.12);
   --badge-outline: rgba(22, 106, 69, 0.08);
@@ -19,16 +24,22 @@
   --elevate-1: rgba(13, 18, 28, 0.035);
   --elevate-2: rgba(13, 18, 28, 0.075);
 
-  /* Core surfaces — DGA-compliant warm neutral palette */
-  --background: 36 32% 98%;            /* #FBFAF7 warm off-white — page */
+  /* Core surfaces — Premium warm editorial palette (DGA-compliant) */
+  --background: 28 60% 96%;            /* #FCF4EF Light Neutral BG (warmer than v1.1) */
   --foreground: 218 38% 8%;            /* #0D121C Gray-950 */
-  --border: 30 14% 90%;                /* #E8E4DE warm neutral border */
-  --card: 0 0% 100%;                   /* #FFFFFF — cards stay clean white */
+  --border: 28 25% 88%;                /* #E8DDD0 warm neutral border (slightly warmer) */
+  --card: 0 0% 100%;                   /* #FFFFFF — primary card surface */
   --card-foreground: 218 38% 8%;
-  --card-border: 30 14% 90%;
+  --card-border: 28 25% 88%;
   --popover: 0 0% 100%;
   --popover-foreground: 218 38% 8%;
-  --popover-border: 30 14% 90%;
+  --popover-border: 28 25% 88%;
+
+  /* Premium surface variants — for editorial layering (skill: 5.3 Depth) */
+  --surface-warm: 28 80% 93%;          /* #F9EBE0 warm panel for editorial sections */
+  --surface-warm-foreground: 218 38% 8%;
+  --surface-cream: 28 60% 96%;         /* #FCF4EF cream — same as bg, for nested cards */
+  --surface-ivory: 36 32% 98%;         /* #FBFAF7 ivory — for max-clean surfaces */
 
   /* Sidebar — clean white with green active states; warm border for cohesion */
   --sidebar: 0 0% 100%;
@@ -45,11 +56,11 @@
   --primary-foreground: 0 0% 100%;
 
   /* Secondary — warm clean neutral */
-  --secondary: 36 28% 96%;             /* #F6F2EC */
+  --secondary: 28 50% 94%;             /* #F4E8D8 warmer secondary */
   --secondary-foreground: 218 38% 8%;
 
   /* Muted */
-  --muted: 36 24% 95%;                 /* #F2EFE9 warm muted */
+  --muted: 28 40% 93%;                 /* #F0E5D5 warm muted */
   --muted-foreground: 215 14% 34%;     /* #4D5761 Gray-600 */
 
   /* Accent — Gold-500 #F8BD02 (KSA flag gold) */
@@ -60,15 +71,23 @@
   --destructive: 4 86% 51%;            /* #D92D20 */
   --destructive-foreground: 0 0% 100%;
 
-  --input: 30 12% 84%;                 /* warm input border */
+  --input: 28 20% 82%;                 /* warm input border */
   --ring: 152 60% 36%;
 
-  /* Chart palette — DGA brand-aligned, accessible */
-  --chart-1: 152 60% 36%;              /* SA-500 Saudi green */
-  --chart-2: 46 99% 49%;               /* Gold-500 */
-  --chart-3: 215 91% 58%;              /* Info-500 #2E90FA */
-  --chart-4: 281 32% 47%;              /* Lavender-500 #80519F */
-  --chart-5: 25 96% 50%;               /* Warning-500 #F79009 */
+  /* Chart palette — DGA brand colors first, premium earth tones as categoricals */
+  --chart-1: 152 60% 36%;              /* SA-500 Saudi green (PRIMARY — DGA) */
+  --chart-2: 46 99% 49%;               /* Gold-500 (ACCENT — DGA) */
+  --chart-3: 16 51% 54%;               /* Warm Brown #C66E4E (premium earth tone) */
+  --chart-4: 14 100% 77%;              /* Soft Coral #FFA38B (premium accent) */
+  --chart-5: 244 53% 87%;              /* Light Purple 40% #CFCCEF (premium neutral) */
+  --chart-6: 18 39% 28%;               /* Dark Brown #623B2A (deep accent) */
+
+  /* Premium earth tone scale — for direct use (chart accents, status, etc.) */
+  --earth-dark-brown: 18 39% 28%;      /* #623B2A */
+  --earth-warm-brown: 16 51% 54%;      /* #C66E4E */
+  --earth-coral: 14 100% 77%;          /* #FFA38B */
+  --earth-light-purple-40: 244 53% 87%; /* #CFCCEF */
+  --earth-light-purple-20: 245 60% 94%; /* #E7E5F7 */
 
   /* Sentiment helpers — DGA semantic palette */
   --sentiment-positive: 152 71% 39%;   /* Success-500 #17B26A */
@@ -92,19 +111,19 @@
   --font-serif: Georgia, serif;
   --font-mono: "IBM Plex Mono", "JetBrains Mono", Menlo, monospace;
 
-  --radius: 0.875rem;                  /* 14px — cards (modernized; DGA permits ≤16px) */
-  --radius-button: 0.5rem;             /* 8px — buttons stay per DGA */
+  --radius: 0.875rem;                  /* 14px — cards (DGA permits ≤16px) */
+  --radius-button: 0.5rem;             /* 8px — buttons LOCKED per DGA */
   --radius-hero: 1rem;                 /* 16px — hero cards max */
 
-  /* Softer, blue-green tinted shadows — modernized but subtle */
-  --shadow-2xs: 0 1px 2px 0 hsl(152 30% 12% / 0.04);
-  --shadow-xs:  0 1px 2px 0 hsl(152 30% 12% / 0.05);
-  --shadow-sm:  0 1px 3px 0 hsl(152 30% 12% / 0.05), 0 1px 2px -1px hsl(152 30% 12% / 0.04);
-  --shadow:     0 2px 4px -1px hsl(152 30% 12% / 0.05), 0 4px 6px -2px hsl(152 30% 12% / 0.04);
-  --shadow-md:  0 4px 8px -2px hsl(152 30% 12% / 0.05), 0 2px 4px -2px hsl(152 30% 12% / 0.04);
-  --shadow-lg:  0 10px 20px -6px hsl(152 30% 12% / 0.08);
-  --shadow-xl:  0 20px 32px -8px hsl(152 30% 12% / 0.10);
-  --shadow-2xl: 0 32px 60px -12px hsl(152 30% 12% / 0.14);
+  /* Premium enterprise shadow stack — warm-tinted, layered, refined */
+  --shadow-2xs: 0 1px 2px 0 hsl(28 30% 20% / 0.04);
+  --shadow-xs:  0 1px 2px 0 hsl(28 30% 20% / 0.05);
+  --shadow-sm:  0 1px 3px 0 hsl(28 30% 20% / 0.06), 0 1px 2px -1px hsl(28 30% 20% / 0.04);
+  --shadow:     0 2px 4px -1px hsl(28 30% 20% / 0.06), 0 4px 6px -2px hsl(28 30% 20% / 0.04);
+  --shadow-md:  0 4px 12px -2px hsl(28 30% 20% / 0.08), 0 2px 4px -2px hsl(28 30% 20% / 0.05);
+  --shadow-lg:  0 12px 28px -6px hsl(28 30% 20% / 0.10), 0 4px 8px -4px hsl(28 30% 20% / 0.06);
+  --shadow-xl:  0 24px 48px -12px hsl(28 30% 20% / 0.14), 0 8px 16px -8px hsl(28 30% 20% / 0.08);
+  --shadow-2xl: 0 40px 80px -20px hsl(28 30% 20% / 0.18), 0 12px 24px -12px hsl(28 30% 20% / 0.10);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -132,18 +151,22 @@
   --opaque-button-border-intensity: -8;
   --elevate-1: rgba(13, 18, 28, 0.035);
   --elevate-2: rgba(13, 18, 28, 0.075);
-  --background: 36 32% 98%;
+  --background: 28 60% 96%;
   --foreground: 218 38% 8%;
-  --border: 30 14% 90%;
+  --border: 28 25% 88%;
   --card: 0 0% 100%;
   --card-foreground: 218 38% 8%;
-  --card-border: 30 14% 90%;
+  --card-border: 28 25% 88%;
   --popover: 0 0% 100%;
   --popover-foreground: 218 38% 8%;
-  --popover-border: 30 14% 90%;
+  --popover-border: 28 25% 88%;
+  --surface-warm: 28 80% 93%;
+  --surface-warm-foreground: 218 38% 8%;
+  --surface-cream: 28 60% 96%;
+  --surface-ivory: 36 32% 98%;
   --sidebar: 0 0% 100%;
   --sidebar-foreground: 215 14% 34%;
-  --sidebar-border: 30 14% 90%;
+  --sidebar-border: 28 25% 88%;
   --sidebar-primary: 152 60% 36%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 144 56% 94%;
@@ -151,21 +174,22 @@
   --sidebar-ring: 152 60% 36%;
   --primary: 152 60% 36%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 36 28% 96%;
+  --secondary: 28 50% 94%;
   --secondary-foreground: 218 38% 8%;
-  --muted: 36 24% 95%;
+  --muted: 28 40% 93%;
   --muted-foreground: 215 14% 34%;
   --accent: 46 99% 49%;
   --accent-foreground: 32 64% 14%;
   --destructive: 4 86% 51%;
   --destructive-foreground: 0 0% 100%;
-  --input: 30 12% 84%;
+  --input: 28 20% 82%;
   --ring: 152 60% 36%;
   --chart-1: 152 60% 36%;
   --chart-2: 46 99% 49%;
-  --chart-3: 215 91% 58%;
-  --chart-4: 281 32% 47%;
-  --chart-5: 25 96% 50%;
+  --chart-3: 16 51% 54%;
+  --chart-4: 14 100% 77%;
+  --chart-5: 244 53% 87%;
+  --chart-6: 18 39% 28%;
 }
 
 @layer base {
@@ -309,9 +333,9 @@ html.a11y-underline-links a:not(.no-underline-a11y) {
   }
 }
 
-/* Card hover lift — modernized: softer, slower, blue-green tinted (DGA-compliant) */
-.card-lift { transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms ease, border-color 240ms ease; }
-.card-lift:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -12px hsl(152 30% 12% / 0.14), 0 4px 10px -4px hsl(152 30% 12% / 0.06); }
+/* Card hover lift — premium: slower, more expressive, warm-tinted */
+.card-lift { transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1), border-color 320ms ease; }
+.card-lift:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -14px hsl(28 30% 20% / 0.16), 0 6px 14px -6px hsl(28 30% 20% / 0.08); }
 
 /* Modernized eyebrow microtype helper (Alinma-inspired) — DGA-safe.
    Use on section labels: <p className="eyebrow">Performance</p> */
@@ -344,3 +368,130 @@ html.a11y-underline-links a:not(.no-underline-a11y) {
 }
 [dir="ltr"] .accent-stripe::before { left: 0; }
 [dir="rtl"] .accent-stripe::before { right: 0; }
+
+/* ====================================================================
+   Premium Enterprise primitives (v2.0)
+   ==================================================================== */
+
+/* Premium card — deeper depth, warm-tinted shadow, subtle inner highlight.
+   Use for high-importance surfaces (KPI tiles, hero containers, dialogs). */
+.premium-card {
+  position: relative;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--card-border));
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.9) inset,
+    0 2px 4px -1px hsl(28 30% 20% / 0.06),
+    0 4px 12px -3px hsl(28 30% 20% / 0.05);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1), border-color 320ms ease;
+}
+.premium-card:hover {
+  transform: translateY(-2px);
+  border-color: hsl(28 25% 82%);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.9) inset,
+    0 8px 20px -6px hsl(28 30% 20% / 0.10),
+    0 16px 32px -10px hsl(28 30% 20% / 0.10);
+}
+
+/* Editorial frame — warm panel for editorial sections (5.2 Layout/Composition).
+   Soft warm background tinted from the brand bg, generous padding intent. */
+.editorial-frame {
+  background-color: hsl(var(--surface-warm));
+  border: 1px solid hsl(28 30% 84%);
+  border-radius: var(--radius-hero);
+  position: relative;
+}
+
+/* Hairline — 1px refined divider, warm-tinted */
+.hairline { background-color: hsl(28 25% 88%); height: 1px; width: 100%; border: 0; }
+.hairline-vertical { background-color: hsl(28 25% 88%); width: 1px; height: 100%; border: 0; }
+
+/* Stat display — large premium number with refined tracking */
+.stat-display {
+  font-size: clamp(1.875rem, 2.5vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--foreground));
+}
+.stat-display-sm {
+  font-size: clamp(1.5rem, 2vw, 1.875rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--foreground));
+}
+
+/* Headline refinement — premium tracking + hierarchy.
+   Apply via .display-h1 etc. Headings still use IBM Plex Sans / Arabic. */
+.display-h1 { font-size: clamp(1.75rem, 3vw, 2.25rem); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
+.display-h2 { font-size: clamp(1.375rem, 2vw, 1.5rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+.display-h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.3; }
+.display-h4 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.4; }
+
+/* Refined body lead — for hero subtitles, page intros */
+.body-lead {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: hsl(var(--muted-foreground));
+  letter-spacing: -0.005em;
+}
+
+/* Premium hero gradient — SA-700 → SA-500, layered with subtle radial highlight */
+.premium-hero-gradient {
+  background-image:
+    radial-gradient(circle at 30% 20%, hsl(46 99% 49% / 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, hsl(152 60% 36% / 0.18) 0%, transparent 60%),
+    linear-gradient(135deg, hsl(var(--sa-700)) 0%, hsl(var(--sa-600)) 50%, hsl(var(--sa-500)) 100%);
+}
+
+/* Warm hero gradient — for non-brand editorial sections (e.g. customer portal welcome) */
+.warm-hero-gradient {
+  background-image:
+    radial-gradient(circle at 20% 30%, hsl(46 99% 49% / 0.10) 0%, transparent 50%),
+    linear-gradient(135deg, hsl(var(--sa-700)) 0%, hsl(var(--sa-500)) 100%);
+}
+
+/* Subtle layered backdrop — use behind editorial sections for depth */
+.layered-backdrop {
+  position: relative;
+}
+.layered-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: -20px -20px auto auto;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle at center, hsl(var(--surface-warm)) 0%, transparent 70%);
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Premium ring — for highlighted/selected states (e.g. active filter) */
+.premium-ring {
+  box-shadow: 0 0 0 1px hsl(var(--card-border)), 0 0 0 4px hsl(var(--sa-100));
+}
+
+/* Refined section spacing helpers */
+.section-rhythm > * + * { margin-top: 1.5rem; }
+.section-rhythm-lg > * + * { margin-top: 2.5rem; }
+
+/* Inline KPI delta chip — monospace tabular for premium feel */
+.kpi-delta {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Subtle warm panel — paired with cards for layered editorial sections */
+.warm-panel {
+  background-color: hsl(var(--surface-warm));
+  border: 1px solid hsl(28 30% 84%);
+  border-radius: var(--radius);
+}

@@ -125,12 +125,12 @@ export default function Login() {
               <span className="text-base font-semibold">{t("brand.name")}</span>
             </div>
 
-            <header className="space-y-2">
+            <header className="space-y-3">
               <p className="eyebrow text-muted-foreground">
                 {lang === "ar" ? "تسجيل الدخول" : "Sign In"}
               </p>
-              <h2 className="text-2xl font-semibold tracking-tight">{t("login.headline")}</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t("login.sub")}</p>
+              <h2 className="display-h2 text-foreground">{t("login.headline")}</h2>
+              <p className="body-lead text-muted-foreground">{t("login.sub")}</p>
             </header>
 
             <form onSubmit={submit} className="space-y-4" data-testid="form-login">
@@ -171,7 +171,7 @@ export default function Login() {
             </form>
 
             {/* Demo accounts card */}
-            <section className="soft-frame p-1.5">
+            <section className="premium-card p-1.5">
               <div className="px-3 pt-2.5 pb-2 flex items-start justify-between gap-3">
                 <div className="space-y-0.5">
                   <p className="eyebrow text-muted-foreground">

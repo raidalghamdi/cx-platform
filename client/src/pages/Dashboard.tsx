@@ -54,7 +54,8 @@ import { CountUp } from "@/components/brand/CountUp";
 import { Sparkline } from "@/components/brand/Sparkline";
 import { InitialsAvatar } from "@/components/brand/InitialsAvatar";
 
-const CHART_COLORS = ["#25935F", "#F8BD02", "#2E90FA", "#80519F", "#F79009", "#17B26A"];
+// Premium palette: GAC primary + gold, then warm earth tones for additional series
+const CHART_COLORS = ["#25935F", "#F8BD02", "#C66E4E", "#FFA38B", "#CFCCEF", "#623B2A"];
 
 function delta(d: number, inverted = false) {
   const positive = inverted ? d < 0 : d > 0;
@@ -107,7 +108,7 @@ function Kpi({
   };
   const tk = tintMap[tint];
   return (
-    <Card className="shadow-card card-lift">
+    <Card className="premium-card card-lift border-0">
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-2">
           <p className="eyebrow text-muted-foreground">{label}</p>
@@ -120,8 +121,8 @@ function Kpi({
             <Icon size={14} strokeWidth={2.2} />
           </span>
         </div>
-        <div className="mt-2 flex items-baseline gap-1.5">
-          <span className="text-2xl font-semibold text-foreground tabular-nums">
+        <div className="mt-3 flex items-baseline gap-1.5">
+          <span className="stat-display-sm text-foreground">
             <CountUp value={numeric} decimals={decimals} />
           </span>
           {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
@@ -185,7 +186,7 @@ export default function Dashboard() {
 
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <Card className="lg:col-span-2 shadow-card">
+        <Card className="lg:col-span-2 premium-card border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center gap-2"><TrendingUp size={14} className="text-primary" />{t("chart.csatTrend")}</CardTitle>
           </CardHeader>
@@ -213,7 +214,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
+        <Card className="premium-card border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center gap-2"><PieChartIcon size={14} className="text-primary" />{t("chart.channelMix")}</CardTitle>
           </CardHeader>
@@ -246,7 +247,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <Card className="lg:col-span-2 shadow-card">
+        <Card className="lg:col-span-2 premium-card border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center gap-2"><BarChart3 size={14} className="text-primary" />{t("chart.complaintsByCategory")}</CardTitle>
           </CardHeader>
@@ -265,7 +266,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
+        <Card className="premium-card border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center gap-2"><AlertTriangle size={14} className="text-amber-600" />{t("chart.slaBreach")}</CardTitle>
           </CardHeader>
@@ -277,7 +278,7 @@ export default function Dashboard() {
                   <XAxis dataKey="m" tickLine={false} axisLine={false} fontSize={11} stroke="#94A3B8" reversed={isRTL} />
                   <YAxis tickLine={false} axisLine={false} fontSize={11} stroke="#94A3B8" orientation={isRTL ? "right" : "left"} />
                   <Tooltip contentStyle={{ background: "white", borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12 }} />
-                  <Line type="monotone" dataKey="v" stroke="#E76F51" strokeWidth={2.2} dot={{ r: 3, fill: "#E76F51" }} />
+                  <Line type="monotone" dataKey="v" stroke="#C66E4E" strokeWidth={2.2} dot={{ r: 3, fill: "#C66E4E" }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -287,7 +288,7 @@ export default function Dashboard() {
 
       {/* Themes + Escalations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="shadow-card">
+        <Card className="premium-card border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center gap-2"><Sparkles size={14} className="text-primary" />{t("chart.themes")}</CardTitle>
           </CardHeader>
@@ -319,7 +320,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
+        <Card className="premium-card border-0">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-semibold flex items-center gap-2"><Flame size={14} className="text-rose-600" />
               {lang === "ar" ? "تصعيدات مفتوحة" : "Open escalations"}

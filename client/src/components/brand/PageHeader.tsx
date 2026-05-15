@@ -22,21 +22,21 @@ export function PageHeader({
   eyebrow?: string;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3 pb-5 mb-6 border-b border-border">
-      <div className="space-y-1 min-w-0">
+    <div className="flex flex-wrap items-end justify-between gap-4 pb-6 mb-7 border-b border-border/70">
+      <div className="space-y-2 min-w-0">
         {eyebrow && (
           <p className="eyebrow text-muted-foreground" data-testid="page-eyebrow">
             {eyebrow}
           </p>
         )}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <h1
-            className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight text-foreground"
+            className="display-h2 flex items-center gap-3 text-foreground"
             data-testid="page-title"
           >
             {Icon && (
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Icon size={18} strokeWidth={2} />
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+                <Icon size={20} strokeWidth={2} />
               </span>
             )}
             <span className="truncate">{title}</span>
@@ -45,7 +45,7 @@ export function PageHeader({
             <RequirementBadge ids={requirementIds} standards={standards} />
           )}
         </div>
-        {subtitle && <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">{subtitle}</p>}
+        {subtitle && <p className="body-lead text-muted-foreground max-w-2xl">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
     </div>
