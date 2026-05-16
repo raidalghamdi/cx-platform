@@ -24,6 +24,7 @@ import {
   Info,
   ShieldCheck,
   ClipboardList,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -69,6 +70,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     titleKey: "nav.system",
     items: [
+      { href: "/automation", key: "nav.automation", Icon: Bot },
       { href: "/admin", key: "nav.admin", Icon: Settings },
     ],
   },

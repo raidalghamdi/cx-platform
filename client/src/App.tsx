@@ -21,6 +21,7 @@ import Portal from "@/pages/Portal";
 import Copilot from "@/pages/Copilot";
 import Admin from "@/pages/Admin";
 import Audit from "@/pages/Audit";
+import Automation from "@/pages/Automation";
 import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
 import About from "@/pages/About";
@@ -62,6 +63,7 @@ function AppRouter() {
       <Route path="/copilot">{() => <Guard path="/copilot"><Copilot /></Guard>}</Route>
       <Route path="/admin">{() => <Guard path="/admin"><Admin /></Guard>}</Route>
       <Route path="/audit">{() => <Guard path="/audit"><Audit /></Guard>}</Route>
+      <Route path="/automation">{() => <Guard path="/automation"><Automation /></Guard>}</Route>
       <Route path="/journeys">{() => <Guard path="/journeys"><Journeys /></Guard>}</Route>
       <Route path="/journeys/:id">{() => <Guard path="/journeys" navKey="/journeys"><JourneyDetail /></Guard>}</Route>
       <Route path="/" component={HomeRedirect} />

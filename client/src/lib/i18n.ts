@@ -77,6 +77,7 @@ export const dict: Dict = {
   "nav.copilot": { en: "AI Copilot", ar: "المساعد الذكي" },
   "nav.admin": { en: "Admin Console", ar: "وحدة الإدارة" },
   "nav.audit": { en: "Audit", ar: "السجل التدقيقي" },
+  "nav.automation": { en: "Automation (RPA)", ar: "الأتمتة (RPA)" },
   "nav.journeys": { en: "Service Journeys", ar: "رحلات الخدمة" },
   "nav.workspace": { en: "Workspace", ar: "مساحة العمل" },
   "nav.preferences": { en: "Preferences", ar: "التفضيلات" },

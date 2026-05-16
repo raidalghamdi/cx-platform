@@ -121,7 +121,7 @@ export function useAuth() {
 // Per-role module access for sidebar visibility and route guarding.
 export const ROLE_NAV: Record<Role, string[]> = {
   executive: ["/about", "/dashboard", "/voc", "/kb", "/journeys", "/governance", "/programme"],
-  supervisor: ["/about", "/dashboard", "/complaints", "/inbox", "/voc", "/kb", "/copilot", "/journeys", "/governance", "/programme"],
+  supervisor: ["/about", "/dashboard", "/complaints", "/inbox", "/voc", "/kb", "/copilot", "/journeys", "/governance", "/programme", "/automation"],
   agent: ["/about", "/inbox", "/complaints", "/kb", "/copilot", "/journeys"],
   quality: ["/about", "/complaints", "/voc", "/kb", "/audit", "/journeys", "/governance"],
   customer: ["/about", "/portal", "/kb"],
@@ -136,6 +136,7 @@ export const ROLE_NAV: Record<Role, string[]> = {
     "/copilot",
     "/admin",
     "/audit",
+    "/automation",
     "/journeys",
     "/governance",
     "/programme",
