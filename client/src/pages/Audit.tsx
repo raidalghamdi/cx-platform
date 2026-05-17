@@ -66,7 +66,7 @@ export default function Audit() {
       <Card className="mb-4 p-4 sm:p-5 shadow-card">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-[#25935F]/10 text-[#25935F] p-2">
+            <div className="rounded-lg bg-[#0069A7]/10 text-[#0069A7] p-2">
               <Link2 className="h-5 w-5" />
             </div>
             <div>
@@ -84,7 +84,7 @@ export default function Audit() {
             <Button
               onClick={handleVerify}
               disabled={verifying || chain.length === 0}
-              className="bg-[#25935F] hover:bg-[#1f7f53] text-white"
+              className="bg-[#0069A7] hover:bg-[#005897] text-white"
             >
               <ShieldCheck className="h-4 w-4 me-2" />
               {verifying
@@ -100,7 +100,7 @@ export default function Audit() {
 
         {verifyResult && verifyResult.ok && (
           <div
-            className="mt-3 rounded-lg border border-[#25935F]/30 bg-[#25935F]/5 text-[#1f7f53] px-3 py-2 text-sm flex items-center gap-2"
+            className="mt-3 rounded-lg border border-[#0069A7]/30 bg-[#0069A7]/5 text-[#005897] px-3 py-2 text-sm flex items-center gap-2"
             role="status"
           >
             <ShieldCheck className="h-4 w-4" />
@@ -174,7 +174,7 @@ export default function Audit() {
                     <button
                       onClick={() => copyHash(e.entryHash)}
                       title={e.entryHash}
-                      className="inline-flex items-center gap-1.5 text-[#25935F] hover:underline"
+                      className="inline-flex items-center gap-1.5 text-[#0069A7] hover:underline"
                       aria-label={`Copy hash ${e.entryHash}`}
                     >
                       <span>{shortHash(e.entryHash)}</span>

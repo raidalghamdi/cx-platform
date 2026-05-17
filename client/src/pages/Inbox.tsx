@@ -1,25 +1,123 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
 import { PageHeader } from "@/components/brand/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  ChannelChip,
-  SentimentChip,
-} from "@/components/brand/StatusChips";
-import { CONVERSATIONS, SUGGESTED_REPLIES } from "@/lib/seed";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { useChannels } from "@/lib/channelsStore";
-import { Send, Sparkles, Paperclip, Inbox as InboxIcon, Info } from "lucide-react";
+import { useInbox, addReply, markOpen, markClosed, type InboxThread, type InboxStatus, type InboxPriority } from "@/lib/inboxStore";
+import { type AdapterChannel } from "@/lib/channelAdapters";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Info,
+  Inbox as InboxIcon,
+  Mail,
+  MessageCircle,
+  MessagesSquare,
+  Send,
+  CheckCircle2,
+  Lock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const CHANNEL_ICONS: Record<AdapterChannel, typeof Mail> = {
+  email: Mail,
+  whatsapp: MessageCircle,
+  chat: MessagesSquare,
+};
+
+const STATUS_TONE: Record<InboxStatus, string> = {
+  new: "bg-[#0069A7]/10 text-[#0069A7] ring-[#0069A7]/20",
+  open: "bg-amber-50 text-amber-700 ring-amber-200",
+  replied: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  closed: "bg-slate-100 text-slate-700 ring-slate-200",
+};
+
+const PRIORITY_DOT: Record<InboxPriority, string> = {
+  low: "bg-slate-400",
+  normal: "bg-sky-500",
+  high: "bg-rose-500",
+};
+
+function formatRelative(iso: string, lang: "en" | "ar"): string {
+  const now = Date.now();
+  const t = new Date(iso).getTime();
+  const diffMin = Math.round((now - t) / 60000);
+  if (diffMin < 1) return lang === "ar" ? "الآن" : "just now";
+  if (diffMin < 60) return lang === "ar" ? `قبل ${diffMin} د` : `${diffMin}m ago`;
+  const diffHr = Math.round(diffMin / 60);
+  if (diffHr < 24) return lang === "ar" ? `قبل ${diffHr} س` : `${diffHr}h ago`;
+  const diffDay = Math.round(diffHr / 24);
+  return lang === "ar" ? `قبل ${diffDay} ي` : `${diffDay}d ago`;
+}
+
 export default function Inbox() {
-  const { t, lang, pick, isRTL } = useLocale();
+  const { t, lang, isRTL } = useLocale();
+  const { toast } = useToast();
   const channels = useChannels();
-  const [activeId, setActiveId] = useState(CONVERSATIONS[0].id);
-  const [draft, setDraft] = useState("");
-  const [mobilePane, setMobilePane] = useState<"queue" | "thread" | "customer">("queue");
-  const active = CONVERSATIONS.find((c) => c.id === activeId)!;
+  const threads = useInbox();
+
+  const [channelFilter, setChannelFilter] = useState<AdapterChannel | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<InboxStatus | "all">("all");
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const active = useMemo(() => threads.find((x) => x.id === activeId) ?? null, [threads, activeId]);
+
+  // Reply form state — channel-specific (email gets subject; whatsapp gets char counter)
+  const [replySubject, setReplySubject] = useState("");
+  const [replyBody, setReplyBody] = useState("");
+  const [sending, setSending] = useState(false);
+
+  function openThread(t: InboxThread) {
+    setActiveId(t.id);
+    setReplySubject(t.subject ? `Re: ${t.subject}` : "");
+    setReplyBody("");
+  }
+
+  async function onSend() {
+    if (!active) return;
+    if (!replyBody.trim()) return;
+    setSending(true);
+    const res = await addReply(active.id, {
+      subject: active.channel === "email" ? replySubject : undefined,
+      body: replyBody.trim(),
+    });
+    setSending(false);
+    if (res.ok) {
+      toast({ title: t("inbox.reply.sent"), description: active.channel.toUpperCase() });
+      setReplyBody("");
+    } else {
+      toast({ title: t("inbox.reply.failed"), description: res.error ?? "" });
+    }
+  }
+
+  const filtered = useMemo(() => {
+    return threads
+      .filter((t) => (channelFilter === "all" ? true : t.channel === channelFilter))
+      .filter((t) => (statusFilter === "all" ? true : t.status === statusFilter))
+      .sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime());
+  }, [threads, channelFilter, statusFilter]);
+
+  const counts = useMemo(() => {
+    const by = (fn: (x: InboxThread) => boolean) => threads.filter(fn).length;
+    return {
+      all: threads.length,
+      email: by((x) => x.channel === "email"),
+      whatsapp: by((x) => x.channel === "whatsapp"),
+      chat: by((x) => x.channel === "chat"),
+      new: by((x) => x.status === "new"),
+      open: by((x) => x.status === "open"),
+      replied: by((x) => x.status === "replied"),
+      closed: by((x) => x.status === "closed"),
+    };
+  }, [threads]);
 
   return (
     <div>
@@ -29,7 +127,8 @@ export default function Inbox() {
         subtitle={lang === "ar" ? "محادثات نشطة عبر القنوات" : "Active conversations across channels"}
       />
 
-      <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50/60 p-3 flex items-start gap-2.5">
+      {/* Data-sources banner (preserved from Round 2) */}
+      <div className="mb-4 rounded-[10px] border border-sky-200 bg-sky-50/60 p-3 flex items-start gap-2.5">
         <Info size={16} className="text-sky-700 mt-0.5 shrink-0" />
         <div className="flex-1 text-[12.5px] text-sky-900 leading-relaxed">
           <p>{t("inbox.channelsBanner")}</p>
@@ -39,211 +138,207 @@ export default function Inbox() {
         </div>
       </div>
 
-      {/* Mobile pane switcher — only visible <lg */}
-      <div className="lg:hidden mb-3">
-        <Tabs value={mobilePane} onValueChange={(v) => setMobilePane(v as any)}>
-          <TabsList className="w-full justify-start overflow-x-auto no-scrollbar">
-            <TabsTrigger value="queue" className="whitespace-nowrap shrink-0">{lang === "ar" ? "قائمة الانتظار" : "Queue"}</TabsTrigger>
-            <TabsTrigger value="thread" className="whitespace-nowrap shrink-0">{lang === "ar" ? "المحادثة" : "Conversation"}</TabsTrigger>
-            <TabsTrigger value="customer" className="whitespace-nowrap shrink-0">{t("tab.customer360")}</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      {/* Channel pills */}
+      <div className="flex flex-wrap gap-2 mb-2">
+        <FilterPill active={channelFilter === "all"} onClick={() => setChannelFilter("all")} label={t("inbox.channels.all")} count={counts.all} />
+        <FilterPill active={channelFilter === "email"} onClick={() => setChannelFilter("email")} label={t("inbox.channels.email")} count={counts.email} Icon={Mail} />
+        <FilterPill active={channelFilter === "whatsapp"} onClick={() => setChannelFilter("whatsapp")} label={t("inbox.channels.whatsapp")} count={counts.whatsapp} Icon={MessageCircle} />
+        <FilterPill active={channelFilter === "chat"} onClick={() => setChannelFilter("chat")} label={t("inbox.channels.chat")} count={counts.chat} Icon={MessagesSquare} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)_300px] gap-4 lg:h-[calc(100vh-220px)] lg:min-h-[640px]">
-        {/* Queue */}
-        <div className={cn(
-          "rounded-xl border border-border bg-card shadow-card overflow-hidden flex flex-col h-[calc(100vh-260px)] min-h-[420px] lg:h-auto lg:min-h-0",
-          mobilePane !== "queue" && "hidden lg:flex"
-        )}>
-          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-            <h3 className="text-sm font-semibold">{lang === "ar" ? "قائمة الانتظار" : "Queue"}</h3>
-            <span className="text-[11px] text-muted-foreground">{CONVERSATIONS.length}</span>
-          </div>
-          <ul className="flex-1 overflow-y-auto divide-y divide-border">
-            {CONVERSATIONS.map((c) => {
-              const isActive = c.id === activeId;
-              return (
-                <li key={c.id}>
-                  <button
-                    onClick={() => setActiveId(c.id)}
-                    data-testid={`conv-${c.id}`}
-                    className={cn(
-                      "w-full text-start px-4 py-3 hover:bg-muted/50 transition-colors",
-                      isActive && "bg-muted/60",
-                    )}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
-                        {c.customer.initials}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[13px] font-semibold truncate">{pick(c.customer.name)}</p>
-                          <span className="text-[10px] text-muted-foreground tabular-nums">{c.updated}</span>
-                        </div>
-                        <p className="text-[12px] text-muted-foreground truncate mt-0.5">{pick(c.preview)}</p>
-                        <div className="flex items-center gap-1.5 mt-1.5">
-                          <ChannelChip ch={c.channel} compact />
-                          <SentimentChip s={c.sentiment} withLabel={false} />
-                          {c.unread > 0 && (
-                            <span className="ms-auto inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold">
-                              {c.unread}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+      {/* Status pills */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <FilterPill subtle active={statusFilter === "all"} onClick={() => setStatusFilter("all")} label={t("common.all")} />
+        <FilterPill subtle active={statusFilter === "new"} onClick={() => setStatusFilter("new")} label={t("inbox.status.new")} count={counts.new} />
+        <FilterPill subtle active={statusFilter === "open"} onClick={() => setStatusFilter("open")} label={t("inbox.status.open")} count={counts.open} />
+        <FilterPill subtle active={statusFilter === "replied"} onClick={() => setStatusFilter("replied")} label={t("inbox.status.replied")} count={counts.replied} />
+        <FilterPill subtle active={statusFilter === "closed"} onClick={() => setStatusFilter("closed")} label={t("inbox.status.closed")} count={counts.closed} />
+      </div>
+
+      <Card className="shadow-card overflow-hidden">
+        <ul className="divide-y divide-border">
+          {filtered.map((th) => {
+            const ChIcon = CHANNEL_ICONS[th.channel];
+            return (
+              <li key={th.id}>
+                <button
+                  onClick={() => openThread(th)}
+                  data-testid={`thread-${th.id}`}
+                  className="w-full text-start px-4 py-3 hover:bg-muted/40 transition-colors flex items-start gap-3"
+                >
+                  <span className={cn("h-2 w-2 rounded-full mt-2 shrink-0", PRIORITY_DOT[th.priority])} aria-label={t("inbox.priority." + th.priority)} />
+                  <span className="h-9 w-9 rounded-full bg-[#0069A7]/10 text-[#0069A7] flex items-center justify-center shrink-0">
+                    <ChIcon size={16} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold truncate">{th.fromName}</span>
+                      <span className="text-[11px] text-muted-foreground truncate" dir="ltr">{th.from}</span>
+                      <span className="ms-auto text-[11px] text-muted-foreground tabular-nums whitespace-nowrap">{formatRelative(th.receivedAt, lang)}</span>
                     </div>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        {/* Thread */}
-        <div className={cn(
-          "rounded-xl border border-border bg-card shadow-card overflow-hidden flex flex-col h-[calc(100vh-260px)] min-h-[520px] lg:h-auto lg:min-h-0",
-          mobilePane !== "thread" && "hidden lg:flex"
-        )}>
-          <div className="px-5 py-3 border-b border-border flex items-center gap-3">
-            <span className="h-9 w-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[11px] font-semibold">
-              {active.customer.initials}
-            </span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">{pick(active.customer.name)}</p>
-              <p className="text-[11px] text-muted-foreground truncate">
-                {pick(active.customer.segment)}
-              </p>
-            </div>
-            <ChannelChip ch={active.channel} />
-            <SentimentChip s={active.sentiment} />
-          </div>
-
-          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3 bg-muted/20">
-            {active.messages.map((m) => {
-              const mine = m.from === "agent";
-              return (
-                <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-                  <div
-                    className={cn(
-                      "max-w-[78%] rounded-2xl px-3.5 py-2.5 text-sm shadow-soft",
-                      mine
-                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "bg-card border border-border rounded-bl-sm",
-                      isRTL && (mine ? "rounded-bl-sm rounded-br-2xl" : "rounded-br-sm rounded-bl-2xl"),
+                    {th.subject && (
+                      <p className="text-[12.5px] font-medium text-foreground mt-0.5 truncate">{th.subject}</p>
                     )}
-                  >
-                    <p className="leading-snug whitespace-pre-wrap">{pick(m.body)}</p>
-                    <p className={cn("text-[10px] mt-1.5 tabular-nums", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                      {m.at}
+                    <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-1">{th.body}</p>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-medium ring-1 ring-inset", STATUS_TONE[th.status])}>
+                        {t("inbox.status." + th.status)}
+                      </span>
+                      <span className="text-[10.5px] text-muted-foreground capitalize">{th.channel}</span>
+                    </div>
+                  </div>
+                </button>
+              </li>
+            );
+          })}
+          {filtered.length === 0 && (
+            <li className="px-4 py-12 text-center text-sm text-muted-foreground">{t("inbox.empty")}</li>
+          )}
+        </ul>
+      </Card>
+
+      {/* Reply drawer */}
+      <Sheet open={!!active} onOpenChange={(o) => !o && setActiveId(null)}>
+        <SheetContent side={isRTL ? "left" : "right"} className="w-full sm:max-w-[640px] p-0 flex flex-col">
+          {active && (
+            <>
+              <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-border">
+                <div className="flex items-center gap-2 text-[11px]">
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-medium ring-1 ring-inset", STATUS_TONE[active.status])}>
+                    {t("inbox.status." + active.status)}
+                  </span>
+                  <span className="text-muted-foreground capitalize">{active.channel}</span>
+                  <span className="ms-auto inline-flex items-center gap-1.5">
+                    <Button size="sm" variant="outline" onClick={() => markOpen(active.id)} data-testid="button-thread-open">
+                      {t("inbox.markOpen")}
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => markClosed(active.id)} data-testid="button-thread-closed">
+                      <Lock size={12} className="me-1" />
+                      {t("inbox.markClosed")}
+                    </Button>
+                  </span>
+                </div>
+                <SheetTitle className="text-lg font-semibold leading-snug pt-1.5">
+                  {active.subject ?? `${active.fromName} · ${active.channel}`}
+                </SheetTitle>
+                <SheetDescription className="text-sm">
+                  <span className="font-medium text-foreground">{active.fromName}</span>
+                  <span className="mx-1.5">·</span>
+                  <span dir="ltr">{active.from}</span>
+                  <span className="mx-1.5">·</span>
+                  {new Date(active.receivedAt).toLocaleString(lang === "ar" ? "ar-SA" : "en-GB")}
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-4 sm:p-6 space-y-4">
+                  {/* Original message */}
+                  <div className="rounded-[10px] border border-border bg-card p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                      {lang === "ar" ? "الرسالة الأصلية" : "Original message"}
                     </p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{active.body}</p>
+                  </div>
+
+                  {/* Existing reply if any */}
+                  {active.replyBody && (
+                    <div className="rounded-[10px] border border-emerald-200 bg-emerald-50/40 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 mb-2 flex items-center gap-1.5">
+                        <CheckCircle2 size={12} />
+                        {t("inbox.reply.yourReply")} · {active.repliedAt && new Date(active.repliedAt).toLocaleString(lang === "ar" ? "ar-SA" : "en-GB")}
+                      </p>
+                      {active.replySubject && (
+                        <p className="text-sm font-medium mb-1">{active.replySubject}</p>
+                      )}
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{active.replyBody}</p>
+                    </div>
+                  )}
+
+                  {/* Reply form — channel-specific */}
+                  <div className="rounded-[10px] border border-border bg-card p-4 space-y-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {lang === "ar" ? "صياغة رد" : "Compose reply"}
+                    </p>
+
+                    {active.channel === "email" && (
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">{t("inbox.reply.subject")}</label>
+                        <Input
+                          value={replySubject}
+                          onChange={(e) => setReplySubject(e.target.value)}
+                          placeholder="Re: …"
+                          data-testid="input-reply-subject"
+                        />
+                      </div>
+                    )}
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-foreground">{t("inbox.reply.body")}</label>
+                      <Textarea
+                        value={replyBody}
+                        onChange={(e) => setReplyBody(e.target.value)}
+                        rows={5}
+                        placeholder={lang === "ar" ? "اكتب الرد…" : "Write your reply…"}
+                        maxLength={active.channel === "whatsapp" ? 4096 : undefined}
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                        data-testid="input-reply-body"
+                      />
+                      {active.channel === "whatsapp" && (
+                        <p className="text-[10.5px] text-muted-foreground tabular-nums text-end" dir="ltr">
+                          {replyBody.length} / 4096 {t("inbox.charCount")}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2">
+                      <Button onClick={onSend} disabled={!replyBody.trim() || sending} data-testid="button-send-reply">
+                        <Send size={14} className="me-1.5" />
+                        {sending ? t("inbox.reply.sending") : t("inbox.reply.send")}
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          <div className="border-t border-border p-3 space-y-2.5 bg-card">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1">
-                <Sparkles size={11} className="text-accent" />
-                {lang === "ar" ? "اقتراحات الذكاء الاصطناعي" : "AI suggestions"}
-              </span>
-              {SUGGESTED_REPLIES.map((r, i) => (
-                <button
-                  key={i}
-                  onClick={() => setDraft(pick(r))}
-                  className="text-[11px] px-2.5 py-1 rounded-full border border-border bg-background hover:bg-muted text-foreground transition-colors truncate max-w-[280px]"
-                  data-testid={`suggestion-${i}`}
-                >
-                  {pick(r)}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-end gap-2">
-              <Textarea
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                rows={2}
-                placeholder={lang === "ar" ? "اكتب ردك…" : "Write your reply…"}
-                className="resize-none"
-                data-testid="input-reply"
-              />
-              <div className="flex flex-col gap-1.5">
-                <Button variant="ghost" size="icon" aria-label="Attach">
-                  <Paperclip size={16} />
-                </Button>
-                <Button size="icon" aria-label="Send" data-testid="button-send">
-                  <Send size={16} />
-                </Button>
               </div>
-            </div>
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-              <Button variant="ghost" size="sm" className="h-7 text-xs">{t("common.saveDraft")}</Button>
-              <span className="ms-auto">{lang === "ar" ? "النغمة: محايد · رسمي" : "Tone: neutral · formal"}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Customer 360 */}
-        <div className={cn(
-          "rounded-xl border border-border bg-card shadow-card overflow-hidden flex flex-col h-[calc(100vh-260px)] min-h-[420px] lg:h-auto lg:min-h-0",
-          mobilePane !== "customer" && "hidden lg:flex"
-        )}>
-          <div className="px-4 py-3 border-b border-border">
-            <h3 className="text-sm font-semibold">{t("tab.customer360")}</h3>
-          </div>
-          <div className="p-4 space-y-4 overflow-y-auto">
-            <div className="flex items-center gap-3">
-              <span className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
-                {active.customer.initials}
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold truncate">{pick(active.customer.name)}</p>
-                <p className="text-[11px] text-muted-foreground" dir="ltr">ID · {active.customer.nationalId}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="rounded-lg border border-border p-2.5">
-                <p className="text-[10px] text-muted-foreground">{lang === "ar" ? "تفاعلات" : "Interactions"}</p>
-                <p className="font-semibold mt-0.5 tabular-nums">{active.customer.interactions}</p>
-              </div>
-              <div className="rounded-lg border border-border p-2.5">
-                <p className="text-[10px] text-muted-foreground">CSAT</p>
-                <p className="font-semibold mt-0.5 tabular-nums">{active.customer.csat.toFixed(1)}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                {lang === "ar" ? "الوسوم" : "Tags"}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {active.tags.map((tag, i) => (
-                  <span key={i} className="inline-flex items-center text-[11px] rounded-full bg-muted px-2 py-0.5">
-                    {pick(tag)}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                {lang === "ar" ? "آخر تفاعلات" : "Recent interactions"}
-              </p>
-              <ul className="space-y-2 text-[12px]">
-                <li className="flex items-center gap-2">
-                  <ChannelChip ch="email" compact />
-                  <span className="truncate text-muted-foreground">CX-2148 · {lang === "ar" ? "قبل ٤ أيام" : "4 days ago"}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <ChannelChip ch="walkin" compact />
-                  <span className="truncate text-muted-foreground">CX-2154 · {lang === "ar" ? "قبل أسبوعين" : "2 weeks ago"}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
+  );
+}
+
+function FilterPill({
+  active,
+  onClick,
+  label,
+  count,
+  Icon,
+  subtle = false,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  count?: number;
+  Icon?: typeof Mail;
+  subtle?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-[100px] px-3 h-8 text-xs font-medium ring-1 transition-colors",
+        active
+          ? subtle
+            ? "bg-foreground text-background ring-foreground"
+            : "bg-[#0069A7] text-white ring-[#005897]"
+          : "bg-card text-foreground ring-border hover:bg-muted/60",
+      )}
+    >
+      {Icon && <Icon size={13} />}
+      <span>{label}</span>
+      {typeof count === "number" && (
+        <span className={cn("tabular-nums text-[10.5px] rounded-full px-1.5", active ? "bg-white/20" : "bg-muted")}>{count}</span>
+      )}
+    </button>
   );
 }

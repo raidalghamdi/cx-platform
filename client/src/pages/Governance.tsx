@@ -130,8 +130,8 @@ function StrategicAlignment() {
                 <PolarGrid stroke="hsl(var(--border))" />
                 <PolarAngleAxis dataKey="dimension" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
                 <PolarRadiusAxis angle={isRTL ? 60 : 30} domain={[0, 5]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
-                <Radar name={t("gov.current")} dataKey="current" stroke="#25935F" fill="#25935F" fillOpacity={0.35} />
-                <Radar name={t("gov.target")} dataKey="target" stroke="#F8BD02" fill="#F8BD02" fillOpacity={0.15} />
+                <Radar name={t("gov.current")} dataKey="current" stroke="#0069A7" fill="#0069A7" fillOpacity={0.35} />
+                <Radar name={t("gov.target")} dataKey="target" stroke="#FAC126" fill="#FAC126" fillOpacity={0.15} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
               </RadarChart>
@@ -395,7 +395,7 @@ function StandardsTraceability() {
 // Tab 3: Compliance Status
 // ─────────────────────────────────────────────────────────────────────
 function ComplianceGauge({ value }: { value: number }) {
-  const tone = value >= 90 ? "#16a34a" : value >= 75 ? "#F8BD02" : "#dc2626";
+  const tone = value >= 90 ? "#16a34a" : value >= 75 ? "#FAC126" : "#dc2626";
   const r = 36;
   const c = 2 * Math.PI * r;
   const off = c - (value / 100) * c;

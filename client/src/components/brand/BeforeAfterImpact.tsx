@@ -85,7 +85,7 @@ export function BeforeAfterImpact() {
               </Bar>
               <Bar dataKey="after" name={lang === "ar" ? "بعد" : "After"} radius={[6, 6, 0, 0]}>
                 {data.map((d, i) => (
-                  <Cell key={i} fill={d.improved ? "#25935F" : "#F04438"} />
+                  <Cell key={i} fill={d.improved ? "#0069A7" : "#F04438"} />
                 ))}
                 <LabelList dataKey="after" position="top" fontSize={10} fill="#0F172A" fontWeight={600} />
               </Bar>

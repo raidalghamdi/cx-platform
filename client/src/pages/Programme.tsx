@@ -453,8 +453,8 @@ function CostValueTab() {
               <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} orientation={isRTL ? "right" : "left"} />
               <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="build" stackId="a" fill="#25935F" name={t("prog.cost.build")} />
-              <Bar dataKey="license" stackId="a" fill="#F8BD02" name={t("prog.cost.license")} />
+              <Bar dataKey="build" stackId="a" fill="#0069A7" name={t("prog.cost.build")} />
+              <Bar dataKey="license" stackId="a" fill="#FAC126" name={t("prog.cost.license")} />
               <Bar dataKey="operate" stackId="a" fill="#2E90FA" name={t("prog.cost.operate")} />
               <Bar dataKey="change" stackId="a" fill="#80519F" name={t("prog.cost.change")} />
               <Bar dataKey="training" stackId="a" fill="#F79009" name={t("prog.cost.training")} />

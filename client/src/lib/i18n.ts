@@ -7,14 +7,14 @@ type Dict = Record<string, { en: string; ar: string }>;
 
 export const dict: Dict = {
   // Brand & shell
-  "brand.name": { en: "CX Platform", ar: "منصة تجربة المستفيد" },
+  "brand.name": { en: "GAC Customer Experience", ar: "تجربة المستفيد — الهيئة" },
   "brand.tagline": {
-    en: "Unified Customer Experience Platform for Government Services",
-    ar: "منصة موحدة لإدارة تجربة المستفيد في القطاع الحكومي",
+    en: "Customer experience — managed by GAC, for GAC.",
+    ar: "تجربة المستفيد — تُدار من الهيئة، للهيئة.",
   },
   "brand.heroLine": {
-    en: "Listen, respond, improve. One platform for every citizen interaction.",
-    ar: "نُصغي، نستجيب، نُحسّن. منصة واحدة لكل تفاعل مع المستفيدين.",
+    en: "We listen, we respond, we keep improving. One place for every customer who reaches out.",
+    ar: "نُصغي، نستجيب، ونواصل التحسين. مكان واحد لكل مستفيد يتواصل معنا.",
   },
 
   // Common
@@ -89,7 +89,7 @@ export const dict: Dict = {
   "login.demoHelp": { en: "Click any role to fill the form. Password is demo.", ar: "اضغط أي دور لتعبئة النموذج. كلمة المرور: demo" },
   "login.invalid": { en: "Invalid email or password", ar: "بريد إلكتروني أو كلمة مرور غير صحيحة" },
   "login.contactSupport": { en: "Need help? Contact your administrator.", ar: "هل تحتاج مساعدة؟ تواصل مع مسؤول النظام." },
-  "login.poweredBy": { en: "Secured workspace · Government CX", ar: "مساحة عمل آمنة · تجربة المستفيد الحكومية" },
+  "login.poweredBy": { en: "GAC — General Authority for Competition", ar: "الهيئة العامة للمنافسة" },
 
   // Roles
   "role.executive": { en: "Executive", ar: "تنفيذي" },
@@ -135,6 +135,59 @@ export const dict: Dict = {
   "complaints.stageColumn": { en: "Journey Stage", ar: "مرحلة الرحلة" },
   "complaints.stageBreakdown": { en: "Stage breakdown", ar: "توزيع المراحل" },
   "complaints.statusChanged": { en: "Status changed", ar: "تم تغيير الحالة" },
+  "complaints.closeDate": { en: "Close Date", ar: "تاريخ الإغلاق" },
+
+  // Inbox channels (Round 3)
+  "inbox.channels.all": { en: "All channels", ar: "كل القنوات" },
+  "inbox.channels.email": { en: "Email", ar: "البريد الإلكتروني" },
+  "inbox.channels.whatsapp": { en: "WhatsApp", ar: "واتساب" },
+  "inbox.channels.chat": { en: "Chat", ar: "محادثة" },
+  "inbox.status.new": { en: "New", ar: "جديد" },
+  "inbox.status.open": { en: "Open", ar: "مفتوح" },
+  "inbox.status.replied": { en: "Replied", ar: "تم الرد" },
+  "inbox.status.closed": { en: "Closed", ar: "مغلق" },
+  "inbox.reply.subject": { en: "Subject", ar: "الموضوع" },
+  "inbox.reply.body": { en: "Body", ar: "النص" },
+  "inbox.reply.send": { en: "Send reply", ar: "إرسال الرد" },
+  "inbox.reply.sending": { en: "Sending…", ar: "جارٍ الإرسال…" },
+  "inbox.reply.sent": { en: "Reply sent", ar: "تم إرسال الرد" },
+  "inbox.reply.failed": { en: "Send failed", ar: "فشل الإرسال" },
+  "inbox.reply.yourReply": { en: "Your reply", ar: "ردك" },
+  "inbox.markOpen": { en: "Mark open", ar: "تحديد كمفتوح" },
+  "inbox.markClosed": { en: "Mark closed", ar: "إغلاق" },
+  "inbox.priority.low": { en: "Low priority", ar: "أولوية منخفضة" },
+  "inbox.priority.normal": { en: "Normal priority", ar: "أولوية عادية" },
+  "inbox.priority.high": { en: "High priority", ar: "أولوية عالية" },
+  "inbox.empty": { en: "No threads in this view", ar: "لا توجد محادثات في هذا العرض" },
+  "inbox.charCount": { en: "characters", ar: "حرفاً" },
+
+  // Architecture page (Round 3)
+  "arch.title": { en: "Reference Architecture", ar: "البنية المرجعية" },
+  "arch.subtitle": {
+    en: "Built in-house by GAC IT, aligned with GAC Reference Architecture v0.1 and Integration Patterns (October 2024).",
+    ar: "طُوّرت داخلياً من فريق تقنية المعلومات في الهيئة، بالتوافق مع البنية المرجعية v0.1 وأنماط التكامل (أكتوبر 2024).",
+  },
+  "arch.domains.title": { en: "Conceptual domains", ar: "النطاقات المفاهيمية" },
+  "arch.domains.security": { en: "Enterprise Security", ar: "أمن المؤسسة" },
+  "arch.domains.metadata": { en: "Enterprise Metadata", ar: "البيانات الوصفية للمؤسسة" },
+  "arch.domains.eam": { en: "Enterprise Architecture Management", ar: "إدارة البنية المؤسسية" },
+  "arch.domains.grc": { en: "Enterprise Governance & Risk Management", ar: "الحوكمة وإدارة المخاطر" },
+  "arch.domains.ops": { en: "Enterprise IT Operations", ar: "عمليات تقنية المعلومات" },
+  "arch.patterns.title": { en: "Integration patterns", ar: "أنماط التكامل" },
+  "arch.patterns.subtitle": {
+    en: "Nine official patterns — message style, security mandate, current state, future state.",
+    ar: "تسعة أنماط معتمدة — أسلوب الرسالة، المرجعية الأمنية، الحالة الحالية، الحالة المستهدفة.",
+  },
+  "arch.col.message": { en: "Message", ar: "الرسالة" },
+  "arch.col.mandate": { en: "Mandate", ar: "المرجعية" },
+  "arch.col.current": { en: "Current state", ar: "الوضع الحالي" },
+  "arch.col.future": { en: "Future state", ar: "الوضع المستهدف" },
+  "arch.mandates.title": { en: "Regulatory mandates", ar: "المرجعيات التنظيمية" },
+  "arch.cloud": {
+    en: "Cloud-adaptive / cloud-native — aligned with the government cloud adoption strategy.",
+    ar: "متوافقة مع السحابة الحكومية — استراتيجية التبني السحابي الحكومي.",
+  },
+  "nav.architecture": { en: "Architecture", ar: "البنية المرجعية" },
 
   // Inbox — channels banner
   "inbox.channelsBanner": {
@@ -370,17 +423,17 @@ export const dict: Dict = {
   // About page
   "about.title": { en: "About the CX Platform", ar: "نبذة عن منصة تجربة المستفيد" },
   "about.subtitle": {
-    en: "A unified, audit-ready customer experience platform aligned to Vision 2030, DGA, EFQM, ISO and PDPL.",
-    ar: "منصة موحدة وجاهزة للتدقيق لتجربة المستفيد، متوافقة مع رؤية 2030 وهيئة الحكومة الرقمية ونموذج التميز الأوروبي والأيزو ونظام حماية البيانات الشخصية.",
+    en: "How we — the GAC team — handle complaints, surveys, and customer service. Built in-house. No external vendor.",
+    ar: "كيف نتعامل — نحن فريق الهيئة — مع الشكاوى والاستبيانات وخدمة المستفيدين. طوّرناها بأنفسنا، بدون أي مزوّد خارجي.",
   },
   "about.purposeLabel": { en: "Purpose", ar: "الغرض" },
   "about.purpose": {
-    en: "One platform for every citizen interaction",
-    ar: "منصة واحدة لكل تفاعل مع المستفيدين",
+    en: "One place for every customer who reaches out to us",
+    ar: "مكان واحد لكل مستفيد يتواصل معنا",
   },
   "about.purposeBody": {
-    en: "The CX Platform consolidates complaints, inquiries, voice of customer, knowledge, citizen self-service and AI-assisted operations into a single, governed environment that meets Saudi government standards and serves citizens in Arabic and English with full accessibility.",
-    ar: "تجمع منصة تجربة المستفيد إدارة الشكاوى والاستفسارات وصوت المستفيد وقاعدة المعرفة وخدمات المستفيد الذاتية والعمليات المدعومة بالذكاء الاصطناعي في بيئة موحدة محوكمة، تتوافق مع معايير الحكومة السعودية وتخدم المستفيدين بالعربية والإنجليزية مع التزام كامل بمعايير الوصول.",
+    en: "We — the GAC team — built this system ourselves. It is where we handle complaints, inquiries, surveys, knowledge articles, and customer self-service. We run it in Arabic and English, we keep it accessible, and we audit ourselves against the standards that apply to us: Vision 2030, DGA, NCA, NDMO, and ISO.",
+    ar: "بنينا — نحن فريق الهيئة — هذا النظام بأنفسنا. نُدير فيه الشكاوى والاستفسارات والاستبيانات وقاعدة المعرفة والخدمة الذاتية للمستفيدين. نُشغّله بالعربية والإنجليزية، ونحافظ على إتاحته للجميع، ونراجع التزامنا بالمعايير التي تنطبق علينا: رؤية 2030، هيئة الحكومة الرقمية، الأمن السيبراني (NCA)، إدارة البيانات (NDMO)، والأيزو.",
   },
   "about.stat.channels": { en: "Channels unified", ar: "قنوات موحدة" },
   "about.stat.languages": { en: "Languages (AR/EN)", ar: "اللغات (عربي/إنجليزي)" },

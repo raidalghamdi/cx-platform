@@ -6,9 +6,11 @@ export default {
   theme: {
     extend: {
       borderRadius: {
-        lg: "var(--radius)",          /* 12px */
-        md: "calc(var(--radius) - 4px)", /* 8px */
-        sm: "calc(var(--radius) - 6px)", /* 6px */
+        lg: "var(--radius)",          /* 10px — GAC cards */
+        md: "calc(var(--radius) - 3px)", /* 7px — small */
+        sm: "calc(var(--radius) - 4px)", /* 6px */
+        pill: "100px",                  /* GAC buttons */
+        input: "22px",                  /* GAC inputs */
       },
       colors: {
         // Flat / base colors (regular buttons)
@@ -103,6 +105,21 @@ export default {
         },
         gold: {
           DEFAULT: "hsl(43 56% 55%)",
+        },
+        // GAC palette — General Authority for Competition
+        gac: {
+          gold: "#FAC126",
+          "gold-fg": "#060606",         /* text on gold */
+          navy: "#00192B",
+          "navy-mid": "#28334A",
+          blue: "#0069A7",              /* institutional / primary */
+          "blue-hover": "#005897",
+          "blue-accent": "#299ECE",
+          "service-green": "#5F9600",
+          "service-gray": "#626467",
+          "bg-page": "#EDEFF1",
+          "bg-card": "#F4F4F4",
+          ink: "#0E0E0E",
         },
       },
       fontFamily: {

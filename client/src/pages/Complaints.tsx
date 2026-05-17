@@ -239,6 +239,7 @@ export default function Complaints() {
                 <th className="text-start px-4 py-3 font-medium">SLA</th>
                 <th className="text-start px-4 py-3 font-medium">{t("common.owner")}</th>
                 <th className="text-start px-4 py-3 font-medium">{t("common.opened")}</th>
+                <th className="text-start px-4 py-3 font-medium">{t("complaints.closeDate")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -275,11 +276,14 @@ export default function Complaints() {
                   <td className="px-4 py-3"><SlaBadge sla={c.sla} /></td>
                   <td className="px-4 py-3 text-muted-foreground">{pick(c.owner)}</td>
                   <td className="px-4 py-3 text-muted-foreground tabular-nums whitespace-nowrap">{c.opened}</td>
+                  <td className="px-4 py-3 text-muted-foreground tabular-nums whitespace-nowrap">
+                    {c.closedAt ? new Date(c.closedAt).toISOString().slice(0, 10) : "—"}
+                  </td>
                 </tr>
               ))}
               {filteredBase.length === 0 && (
                 <tr>
-                  <td colSpan={view === "down" ? 10 : 9} className="px-4 py-12 text-center text-muted-foreground">
+                  <td colSpan={view === "down" ? 11 : 10} className="px-4 py-12 text-center text-muted-foreground">
                     {t("table.empty")}
                   </td>
                 </tr>
@@ -342,6 +346,10 @@ export default function Complaints() {
                       <div><p className="text-[11px] text-muted-foreground mb-0.5">{t("common.opened")}</p><p>{current.opened}</p></div>
                       <div><p className="text-[11px] text-muted-foreground mb-0.5">{t("common.updated")}</p><p>{current.updated}</p></div>
                       <div><p className="text-[11px] text-muted-foreground mb-0.5">{t("common.priority")}</p><p>{t("priority." + current.priority)}</p></div>
+                      <div>
+                        <p className="text-[11px] text-muted-foreground mb-0.5">{t("complaints.closeDate")}</p>
+                        <p className="tabular-nums">{current.closedAt ? new Date(current.closedAt).toISOString().slice(0, 10) : "—"}</p>
+                      </div>
                     </div>
                   </TabsContent>
 

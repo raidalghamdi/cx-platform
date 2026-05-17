@@ -58,7 +58,7 @@ import { Sparkline } from "@/components/brand/Sparkline";
 import { InitialsAvatar } from "@/components/brand/InitialsAvatar";
 
 // Premium palette: GAC primary + gold, then warm earth tones for additional series
-const CHART_COLORS = ["#25935F", "#F8BD02", "#C66E4E", "#FFA38B", "#CFCCEF", "#623B2A"];
+const CHART_COLORS = ["#0069A7", "#FAC126", "#C66E4E", "#FFA38B", "#CFCCEF", "#623B2A"];
 
 function delta(d: number, inverted = false) {
   const positive = inverted ? d < 0 : d > 0;
@@ -103,8 +103,8 @@ function Kpi({
 }) {
   const { t } = useLocale();
   const tintMap: Record<string, { chip: string; spark: string }> = {
-    emerald: { chip: "bg-emerald-100 text-emerald-700 ring-emerald-200", spark: "#25935F" },
-    amber: { chip: "bg-amber-100 text-amber-800 ring-amber-200", spark: "#F8BD02" },
+    emerald: { chip: "bg-emerald-100 text-emerald-700 ring-emerald-200", spark: "#0069A7" },
+    amber: { chip: "bg-amber-100 text-amber-800 ring-amber-200", spark: "#FAC126" },
     sky: { chip: "bg-sky-100 text-sky-700 ring-sky-200", spark: "#2E90FA" },
     violet: { chip: "bg-violet-100 text-violet-700 ring-violet-200", spark: "#80519F" },
     rose: { chip: "bg-rose-100 text-rose-700 ring-rose-200", spark: "#E76F51" },
@@ -208,8 +208,8 @@ export default function Dashboard() {
                 <AreaChart data={CSAT_TREND} margin={{ top: 8, right: 12, left: -10, bottom: 0 }}>
                   <defs>
                     <linearGradient id="csatFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#25935F" stopOpacity={0.28} />
-                      <stop offset="100%" stopColor="#25935F" stopOpacity={0.02} />
+                      <stop offset="0%" stopColor="#0069A7" stopOpacity={0.28} />
+                      <stop offset="100%" stopColor="#0069A7" stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
@@ -219,7 +219,7 @@ export default function Dashboard() {
                     contentStyle={{ background: "white", borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12 }}
                     formatter={(v: number) => [`${v}%`, t("kpi.csat")]}
                   />
-                  <Area type="monotone" dataKey="v" stroke="#25935F" strokeWidth={2.2} fill="url(#csatFill)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                  <Area type="monotone" dataKey="v" stroke="#0069A7" strokeWidth={2.2} fill="url(#csatFill)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -277,7 +277,7 @@ export default function Dashboard() {
                   <XAxis type="number" tickLine={false} axisLine={false} fontSize={11} stroke="#94A3B8" reversed={isRTL} />
                   <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} width={140} fontSize={11} stroke="#475569" orientation={isRTL ? "right" : "left"} />
                   <Tooltip contentStyle={{ background: "white", borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12 }} />
-                  <Bar dataKey="value" fill="#25935F" radius={[0, 6, 6, 0]} />
+                  <Bar dataKey="value" fill="#0069A7" radius={[0, 6, 6, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

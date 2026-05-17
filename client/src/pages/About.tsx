@@ -98,7 +98,7 @@ export default function About() {
       {/* Hero / Vision */}
       <Card className="shadow-card overflow-hidden mb-8 border-primary/20">
         <div className="relative bg-gradient-to-br from-primary/15 via-primary/5 to-background">
-          <HeroPattern variant="hex" opacity={0.05} color="#25935F" />
+          <HeroPattern variant="hex" opacity={0.05} color="#0069A7" />
           <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "radial-gradient(circle at 30% 20%, var(--primary) 0%, transparent 60%)" }} />
           <CardContent className="relative p-8 lg:p-12">
             <Badge variant="outline" className="mb-4 border-primary/40 text-primary bg-white/60 backdrop-blur-sm">

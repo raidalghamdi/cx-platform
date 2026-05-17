@@ -1,12 +1,24 @@
+/* Google Fonts — Exo 2 (Latin). GE SS Two is proprietary and not hosted on
+   Google; Tahoma falls back per the GAC brand guidance. Must precede all
+   other statements per CSS spec. */
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* CX Platform — DGA Design System v2.0 (Premium Enterprise within DGA limits)
+/* CX Platform — GAC Design System v3.0 (Round-3 re-skin)
    ============================================================================
+   COLOR RULE — GAC primary identity:
+     Primary CTA:  Gold  #FAC126  with text #060606
+     Institutional: Blue #0069A7
+     Navy headings: #00192B / mid #28334A
+   Saudi green (#25935F) and KSA gold (#F8BD02) are retained as Vision 2030
+   secondaries — still available via the sa-* tokens. */
+/* CX Platform — DGA Design System v2.0 — legacy comment preserved
    COLOR RULE — LOCKED:
-     Primary: SA-500 Saudi green #25935F (DGA-mandated, never replaced)
-     Accent:  Gold-500 #F8BD02 (KSA flag accent, never replaced)
+     Primary: SA-500 Saudi green #25935F (Vision 2030 — secondary in v3.0)
+     Accent:  Gold-500 #F8BD02 (KSA flag — secondary in v3.0)
    v2.0 upgrade — Premium Enterprise design system applied EXCEPT colors:
      • Warm editorial page background #FCF4EF (Light Neutral BG from skill)
      • Warm surface accent #F9EBE0 for editorial panels (used sparingly)
@@ -24,16 +36,16 @@
   --elevate-1: rgba(13, 18, 28, 0.035);
   --elevate-2: rgba(13, 18, 28, 0.075);
 
-  /* Core surfaces — Premium warm editorial palette (DGA-compliant) */
-  --background: 28 60% 96%;            /* #FCF4EF Light Neutral BG (warmer than v1.1) */
-  --foreground: 218 38% 8%;            /* #0D121C Gray-950 */
-  --border: 28 25% 88%;                /* #E8DDD0 warm neutral border (slightly warmer) */
-  --card: 0 0% 100%;                   /* #FFFFFF — primary card surface */
-  --card-foreground: 218 38% 8%;
-  --card-border: 28 25% 88%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 218 38% 8%;
-  --popover-border: 28 25% 88%;
+  /* Core surfaces — GAC palette (v3.0) */
+  --background: 210 9% 93%;            /* #EDEFF1 GAC page background */
+  --foreground: 0 0% 5%;               /* #0E0E0E body ink */
+  --border: 210 8% 86%;                /* neutral cool border */
+  --card: 0 0% 96%;                    /* #F4F4F4 GAC card surface */
+  --card-foreground: 0 0% 5%;
+  --card-border: 210 8% 86%;
+  --popover: 0 0% 100%;                /* white popovers */
+  --popover-foreground: 0 0% 5%;
+  --popover-border: 210 8% 86%;
 
   /* Premium surface variants — for editorial layering (skill: 5.3 Depth) */
   --surface-warm: 28 80% 93%;          /* #F9EBE0 warm panel for editorial sections */
@@ -41,46 +53,47 @@
   --surface-cream: 28 60% 96%;         /* #FCF4EF cream — same as bg, for nested cards */
   --surface-ivory: 36 32% 98%;         /* #FBFAF7 ivory — for max-clean surfaces */
 
-  /* Sidebar — clean white with green active states; warm border for cohesion */
+  /* Sidebar — white with GAC navy active states */
   --sidebar: 0 0% 100%;
-  --sidebar-foreground: 215 14% 34%;   /* #4D5761 Gray-600 */
-  --sidebar-border: 30 14% 90%;        /* matches main border */
-  --sidebar-primary: 152 60% 36%;      /* SA-500 #25935F */
+  --sidebar-foreground: 215 21% 25%;
+  --sidebar-border: 210 8% 86%;
+  --sidebar-primary: 203 100% 33%;     /* GAC blue #0069A7 */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 144 56% 94%;       /* SA-50 #F3FCF6 hover tint */
-  --sidebar-accent-foreground: 152 64% 26%; /* SA-700 #166A45 */
-  --sidebar-ring: 152 60% 36%;
+  --sidebar-accent: 203 100% 96%;      /* faint blue hover */
+  --sidebar-accent-foreground: 209 100% 22%;
+  --sidebar-ring: 203 100% 33%;
 
-  /* Primary — Saudi green SA-500 #25935F */
-  --primary: 152 60% 36%;
+  /* Primary — GAC institutional blue #0069A7 (used for sidebars, links,
+     section accents). Primary CTAs come from --accent (gold) per GAC guide. */
+  --primary: 203 100% 33%;
   --primary-foreground: 0 0% 100%;
 
-  /* Secondary — warm clean neutral */
-  --secondary: 28 50% 94%;             /* #F4E8D8 warmer secondary */
-  --secondary-foreground: 218 38% 8%;
+  /* Secondary — neutral cool */
+  --secondary: 210 9% 90%;
+  --secondary-foreground: 0 0% 5%;
 
   /* Muted */
-  --muted: 28 40% 93%;                 /* #F0E5D5 warm muted */
-  --muted-foreground: 215 14% 34%;     /* #4D5761 Gray-600 */
+  --muted: 210 9% 90%;
+  --muted-foreground: 215 6% 39%;      /* #626467 GAC service gray */
 
-  /* Accent — Gold-500 #F8BD02 (KSA flag gold) */
-  --accent: 46 99% 49%;
-  --accent-foreground: 32 64% 14%;     /* Gold-900 #3B2F0A */
+  /* Accent — GAC gold #FAC126; text on gold is #060606 (never white) */
+  --accent: 45 96% 56%;                /* #FAC126 */
+  --accent-foreground: 0 0% 4%;        /* #060606 */
 
   /* Destructive — Error-600 */
   --destructive: 4 86% 51%;            /* #D92D20 */
   --destructive-foreground: 0 0% 100%;
 
-  --input: 28 20% 82%;                 /* warm input border */
-  --ring: 152 60% 36%;
+  --input: 210 8% 86%;                 /* GAC cool input border */
+  --ring: 203 100% 33%;                /* GAC blue focus ring */
 
-  /* Chart palette — DGA brand colors first, premium earth tones as categoricals */
-  --chart-1: 152 60% 36%;              /* SA-500 Saudi green (PRIMARY — DGA) */
-  --chart-2: 46 99% 49%;               /* Gold-500 (ACCENT — DGA) */
-  --chart-3: 16 51% 54%;               /* Warm Brown #C66E4E (premium earth tone) */
-  --chart-4: 14 100% 77%;              /* Soft Coral #FFA38B (premium accent) */
-  --chart-5: 244 53% 87%;              /* Light Purple 40% #CFCCEF (premium neutral) */
-  --chart-6: 18 39% 28%;               /* Dark Brown #623B2A (deep accent) */
+  /* Chart palette — GAC primary identity */
+  --chart-1: 203 100% 33%;             /* GAC blue #0069A7 (PRIMARY) */
+  --chart-2: 45 96% 56%;               /* GAC gold #FAC126 (ACCENT) */
+  --chart-3: 78 100% 29%;              /* Service green #5F9600 */
+  --chart-4: 199 64% 49%;              /* Blue accent #299ECE */
+  --chart-5: 210 23% 22%;              /* Navy mid #28334A */
+  --chart-6: 215 6% 39%;               /* Service gray #626467 */
 
   /* Premium earth tone scale — for direct use (chart accents, status, etc.) */
   --earth-dark-brown: 18 39% 28%;      /* #623B2A */
@@ -105,15 +118,17 @@
   --gold-500: 46 99% 49%;              /* #F8BD02 */
   --lavender-500: 281 32% 47%;         /* #80519F */
 
-  /* Typography — DGA standard: IBM Plex Sans Arabic / IBM Plex Sans */
-  --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-arabic: "IBM Plex Sans Arabic", "IBM Plex Sans", system-ui, sans-serif;
+  /* Typography — GAC standard: GE SS Two (Arabic) / Exo 2 (Latin)
+     GE SS Two is proprietary; tahoma is the official fallback. */
+  --font-sans: "Exo 2", "IBM Plex Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-arabic: "GE SS Two", tahoma, "IBM Plex Sans Arabic", system-ui, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: "IBM Plex Mono", "JetBrains Mono", Menlo, monospace;
 
-  --radius: 0.875rem;                  /* 14px — cards (DGA permits ≤16px) */
-  --radius-button: 0.5rem;             /* 8px — buttons LOCKED per DGA */
-  --radius-hero: 1rem;                 /* 16px — hero cards max */
+  --radius: 0.625rem;                  /* 10px — GAC card radius */
+  --radius-button: 100px;              /* pill — GAC button radius */
+  --radius-input: 22px;                /* GAC input radius */
+  --radius-hero: 0.625rem;             /* 10px hero cards */
 
   /* Premium enterprise shadow stack — warm-tinted, layered, refined */
   --shadow-2xs: 0 1px 2px 0 hsl(28 30% 20% / 0.04);
@@ -146,50 +161,50 @@
 /* CX Platform is light-only — keep .dark identical to :root so any stray dark
    class doesn't break the DGA visual language. */
 .dark {
-  --button-outline: rgba(22, 106, 69, 0.12);
-  --badge-outline: rgba(22, 106, 69, 0.08);
+  --button-outline: rgba(0, 105, 167, 0.18);
+  --badge-outline: rgba(0, 105, 167, 0.10);
   --opaque-button-border-intensity: -8;
   --elevate-1: rgba(13, 18, 28, 0.035);
   --elevate-2: rgba(13, 18, 28, 0.075);
-  --background: 28 60% 96%;
-  --foreground: 218 38% 8%;
-  --border: 28 25% 88%;
-  --card: 0 0% 100%;
-  --card-foreground: 218 38% 8%;
-  --card-border: 28 25% 88%;
+  --background: 210 9% 93%;
+  --foreground: 0 0% 5%;
+  --border: 210 8% 86%;
+  --card: 0 0% 96%;
+  --card-foreground: 0 0% 5%;
+  --card-border: 210 8% 86%;
   --popover: 0 0% 100%;
-  --popover-foreground: 218 38% 8%;
-  --popover-border: 28 25% 88%;
-  --surface-warm: 28 80% 93%;
-  --surface-warm-foreground: 218 38% 8%;
-  --surface-cream: 28 60% 96%;
-  --surface-ivory: 36 32% 98%;
+  --popover-foreground: 0 0% 5%;
+  --popover-border: 210 8% 86%;
+  --surface-warm: 210 9% 95%;
+  --surface-warm-foreground: 0 0% 5%;
+  --surface-cream: 210 9% 95%;
+  --surface-ivory: 0 0% 99%;
   --sidebar: 0 0% 100%;
-  --sidebar-foreground: 215 14% 34%;
-  --sidebar-border: 28 25% 88%;
-  --sidebar-primary: 152 60% 36%;
+  --sidebar-foreground: 215 21% 25%;
+  --sidebar-border: 210 8% 86%;
+  --sidebar-primary: 203 100% 33%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 144 56% 94%;
-  --sidebar-accent-foreground: 152 64% 26%;
-  --sidebar-ring: 152 60% 36%;
-  --primary: 152 60% 36%;
+  --sidebar-accent: 203 100% 96%;
+  --sidebar-accent-foreground: 209 100% 22%;
+  --sidebar-ring: 203 100% 33%;
+  --primary: 203 100% 33%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 28 50% 94%;
-  --secondary-foreground: 218 38% 8%;
-  --muted: 28 40% 93%;
-  --muted-foreground: 215 14% 34%;
-  --accent: 46 99% 49%;
-  --accent-foreground: 32 64% 14%;
+  --secondary: 210 9% 90%;
+  --secondary-foreground: 0 0% 5%;
+  --muted: 210 9% 90%;
+  --muted-foreground: 215 6% 39%;
+  --accent: 45 96% 56%;
+  --accent-foreground: 0 0% 4%;
   --destructive: 4 86% 51%;
   --destructive-foreground: 0 0% 100%;
-  --input: 28 20% 82%;
-  --ring: 152 60% 36%;
-  --chart-1: 152 60% 36%;
-  --chart-2: 46 99% 49%;
-  --chart-3: 16 51% 54%;
-  --chart-4: 14 100% 77%;
-  --chart-5: 244 53% 87%;
-  --chart-6: 18 39% 28%;
+  --input: 210 8% 86%;
+  --ring: 203 100% 33%;
+  --chart-1: 203 100% 33%;
+  --chart-2: 45 96% 56%;
+  --chart-3: 78 100% 29%;
+  --chart-4: 199 64% 49%;
+  --chart-5: 210 23% 22%;
+  --chart-6: 215 6% 39%;
 }
 
 @layer base {
@@ -204,11 +219,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* DGA focus ring — 4px SA-300 #88D8AD */
+  /* GAC focus ring — 4px gold (#FAC126) — never paired with white text */
   *:focus-visible {
-    outline: 2px solid hsl(var(--sa-500));
+    outline: 2px solid hsl(var(--primary));
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px hsl(var(--sa-300) / 0.5);
+    box-shadow: 0 0 0 4px hsl(var(--accent) / 0.6);
   }
 
   /* Subtle gold rule — KSA flag accent, thin */

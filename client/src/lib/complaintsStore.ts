@@ -80,10 +80,15 @@ export function updateStatus(id: string, status: ComplaintStatus, actor: { en: s
       en: `Status changed to ${status}`,
       ar: `تم تغيير الحالة إلى ${status}`,
     };
+    // Close-date tracking (Round 3) — set when status moves to resolved/closed,
+    // clear if the case is reopened to any other status.
+    const isClosing = status === "resolved" || status === "closed";
+    const closedAt = isClosing ? new Date().toISOString() : undefined;
     return {
       ...c,
       status,
       updated: nowStamp().slice(0, 10),
+      closedAt,
       timeline: [...c.timeline, { at: nowStamp(), action, actor }],
     };
   });

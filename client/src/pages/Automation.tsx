@@ -46,7 +46,7 @@ export default function Automation() {
           <div className="text-xs uppercase tracking-wider text-muted-foreground">
             {lang === "ar" ? "قواعد مفعّلة" : "Active rules"}
           </div>
-          <div className="mt-1 text-2xl font-semibold text-[#25935F]">
+          <div className="mt-1 text-2xl font-semibold text-[#0069A7]">
             {enabledCount}
             <span className="text-base text-muted-foreground"> / {rules.length}</span>
           </div>
@@ -55,20 +55,20 @@ export default function Automation() {
           <div className="text-xs uppercase tracking-wider text-muted-foreground">
             {lang === "ar" ? "إجراءات منفّذة" : "Actions executed"}
           </div>
-          <div className="mt-1 text-2xl font-semibold text-[#25935F]">{totalRuns}</div>
+          <div className="mt-1 text-2xl font-semibold text-[#0069A7]">{totalRuns}</div>
         </Card>
         <Card className="p-4 shadow-card">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">
             {lang === "ar" ? "حالات معالَجة" : "Tickets touched"}
           </div>
-          <div className="mt-1 text-2xl font-semibold text-[#25935F]">{uniqueTickets}</div>
+          <div className="mt-1 text-2xl font-semibold text-[#0069A7]">{uniqueTickets}</div>
         </Card>
       </div>
 
       {/* Rules */}
       <Card className="mb-4 shadow-card overflow-hidden">
         <div className="px-4 sm:px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-          <Zap className="h-4 w-4 text-[#25935F]" />
+          <Zap className="h-4 w-4 text-[#0069A7]" />
           <h2 className="text-sm font-semibold">
             {lang === "ar" ? "قواعد الأتمتة" : "Automation rules"}
           </h2>
@@ -84,7 +84,7 @@ export default function Automation() {
                   <span className="font-mono text-[11px] text-muted-foreground">{r.id}</span>
                   <span className="font-medium text-sm">{pick(r.name)}</span>
                   {r.enabled ? (
-                    <Badge className="bg-[#25935F]/10 text-[#25935F] border-[#25935F]/30 hover:bg-[#25935F]/10">
+                    <Badge className="bg-[#0069A7]/10 text-[#0069A7] border-[#0069A7]/30 hover:bg-[#0069A7]/10">
                       {lang === "ar" ? "مفعّلة" : "Active"}
                     </Badge>
                   ) : (
@@ -121,7 +121,7 @@ export default function Automation() {
       {/* Execution log */}
       <Card className="shadow-card overflow-hidden">
         <div className="px-4 sm:px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-          <PlayCircle className="h-4 w-4 text-[#25935F]" />
+          <PlayCircle className="h-4 w-4 text-[#0069A7]" />
           <h2 className="text-sm font-semibold">
             {lang === "ar" ? "سجل تنفيذ الأتمتة" : "Automation execution log"}
           </h2>

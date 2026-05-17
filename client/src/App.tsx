@@ -28,6 +28,7 @@ import JourneyDetail from "@/pages/JourneyDetail";
 import About from "@/pages/About";
 import Governance from "@/pages/Governance";
 import Programme from "@/pages/Programme";
+import Architecture from "@/pages/Architecture";
 import AccessDenied from "@/pages/AccessDenied";
 import NotFound from "@/pages/not-found";
 
@@ -53,6 +54,7 @@ function AppRouter() {
       <Route path="/about">{() => <Guard path="/about"><About /></Guard>}</Route>
       <Route path="/governance">{() => <Guard path="/governance"><Governance /></Guard>}</Route>
       <Route path="/programme">{() => <Guard path="/programme"><Programme /></Guard>}</Route>
+      <Route path="/architecture">{() => <Guard path="/architecture"><Architecture /></Guard>}</Route>
       <Route path="/dashboard">{() => <Guard path="/dashboard"><Dashboard /></Guard>}</Route>
       <Route path="/complaints">{() => <Guard path="/complaints"><Complaints /></Guard>}</Route>
       <Route path="/inbox">{() => <Guard path="/inbox"><Inbox /></Guard>}</Route>

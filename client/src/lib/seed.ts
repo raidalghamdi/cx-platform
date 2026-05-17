@@ -41,6 +41,7 @@ export type Complaint = {
   owner: Bi;
   opened: string;
   updated: string;
+  closedAt?: string; // ISO datetime when status moved to resolved/closed (Round 3)
   agency: Bi;
   sentiment: Sentiment;
   timeline: { at: string; action: Bi; actor: Bi }[];
@@ -217,6 +218,7 @@ export const COMPLAINTS: Complaint[] = [
     owner: AGENTS[3],
     opened: "2026-05-02",
     updated: "2026-05-06",
+    closedAt: "2026-05-06T09:30:00.000Z",
     agency: AGENCIES[2],
     sentiment: "neutral",
     timeline: [
@@ -289,6 +291,7 @@ export const COMPLAINTS: Complaint[] = [
     owner: AGENTS[1],
     opened: "2026-04-28",
     updated: "2026-05-02",
+    closedAt: "2026-05-02T11:00:00.000Z",
     agency: AGENCIES[1],
     sentiment: "neutral",
     timeline: [

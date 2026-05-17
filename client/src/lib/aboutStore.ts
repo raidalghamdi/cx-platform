@@ -17,23 +17,23 @@ export type AboutContent = {
 
 const DEFAULTS: AboutContent = {
   hero: {
-    en: "A unified, audit-ready customer experience platform aligned to Vision 2030, DGA, EFQM, ISO, and PDPL — with Round-2 enhancements for RPA automation, hash-chained audit, Monafasah+ integration, an editable knowledge base, MS Project import, and granular role permissions.",
-    ar: "منصة موحّدة وجاهزة للتدقيق لتجربة المستفيد، متوافقة مع رؤية 2030 وهيئة الحكومة الرقمية ونموذج EFQM والأيزو ونظام حماية البيانات الشخصية — مع تحسينات الجولة الثانية للأتمتة RPA، وسلسلة تدقيق مُجزّأة، وتكامل منافسة+، وقاعدة معرفة قابلة للتحرير، واستيراد MS Project، وصلاحيات أدوار مفصّلة.",
+    en: "This is the customer experience system used by the General Authority for Competition. Our IT team built it in-house — no external vendor. Every page you see is something we run, audit, and improve ourselves, in line with Vision 2030, the Digital Government Authority, the National Cybersecurity Authority (NCA), and the National Data Management Office (NDMO).",
+    ar: "هذه هي منظومة تجربة المستفيد التي تستخدمها الهيئة العامة للمنافسة. طوّرها فريق تقنية المعلومات لدينا داخلياً وبدون أي مزوّد خارجي. كل صفحة هنا نديرها ونراجعها ونحسّنها بأنفسنا، بما يتوافق مع رؤية 2030 وهيئة الحكومة الرقمية والأمن السيبراني (NCA) وإدارة البيانات الوطنية (NDMO).",
   },
   mission: {
-    en: "Listen to every citizen interaction, resolve faster than ever, and improve continuously through evidence — all in a single, governed workspace.",
-    ar: "نُصغي إلى كل تفاعل مع المستفيد، نحلّ أسرع من أي وقت مضى، ونُحسّن باستمرار بناءً على الأدلة — في بيئة عمل واحدة محوكمة.",
+    en: "We listen to every citizen and business that reaches out to us, we close the loop quickly, and we keep an honest record of what worked and what didn't.",
+    ar: "نُصغي إلى كل مواطن ومنشأة يتواصلون معنا، نُغلق الحلقة بسرعة، ونحتفظ بسجل أمين لما نجح وما لم ينجح.",
   },
   vision: {
-    en: "World-class government customer experience by 2030 — bilingual, accessible, AI-assisted, and accountable.",
-    ar: "تجربة مستفيد حكومية عالمية بحلول 2030 — ثنائية اللغة، متاحة للجميع، مدعومة بالذكاء الاصطناعي، وخاضعة للمساءلة.",
+    en: "A government service experience that we — the GAC team — would be proud to use ourselves, every working day.",
+    ar: "تجربة خدمة حكومية نفخر — نحن فريق الهيئة — باستخدامها بأنفسنا كل يوم عمل.",
   },
   values: [
-    { en: "Customer-first", ar: "المستفيد أولاً" },
-    { en: "Transparency", ar: "الشفافية" },
-    { en: "Accountability", ar: "المساءلة" },
-    { en: "Continuous improvement", ar: "التحسين المستمر" },
-    { en: "Responsible AI", ar: "الذكاء الاصطناعي المسؤول" },
+    { en: "Built in-house — no external vendor", ar: "تطوير داخلي — بدون مزوّد خارجي" },
+    { en: "Plain language over jargon", ar: "لغة واضحة بدلاً من المصطلحات" },
+    { en: "Closing the loop, not just logging it", ar: "إغلاق الحلقة وليس مجرد التسجيل" },
+    { en: "Evidence over opinions", ar: "الأدلة قبل الآراء" },
+    { en: "Honest about what we don't know", ar: "صادقون فيما لا نعرفه" },
   ],
   milestones: [
     { year: "2025 Q3", title: { en: "Platform foundation & blueprint", ar: "تأسيس المنصة والمخطط الشامل" } },
