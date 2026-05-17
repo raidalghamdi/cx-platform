@@ -28,7 +28,7 @@ const TILES: Tile[] = [
     target: "≥ 90%",
     description: {
       ar: "نسبة المستفيدين الذين أتموا المهمة بنجاح من المحاولة الأولى.",
-      en: "Beneficiaries completing the task successfully on first attempt.",
+      en: "Customers completing the task successfully on first attempt.",
     },
     percent: 94.6,
     tint: "primary",
@@ -80,7 +80,7 @@ const TILES: Tile[] = [
     target: "≥ 85%",
     description: {
       ar: "نسبة المستفيدين الذين يعبّرون عن ثقتهم بقنوات الخدمة الرقمية.",
-      en: "Beneficiaries who report trust in the digital channels.",
+      en: "Customers who report trust in the digital channels.",
     },
     percent: 92.1,
     tint: "violet",
@@ -115,6 +115,12 @@ export function UsabilityPanel() {
         </p>
       </CardHeader>
       <CardContent>
+        <div className="mb-3">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-sky-50 ring-1 ring-sky-200 text-[10.5px] font-medium text-sky-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+            {lang === "ar" ? "جاهز للربط عبر API — توصيل مباشر بالأنظمة التشغيلية" : "API-ready · Live wire to operational systems"}
+          </span>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {TILES.map((tile) => {
             const cls = TINT_CLS[tile.tint];

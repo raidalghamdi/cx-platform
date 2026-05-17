@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { PageHeader } from "@/components/brand/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { SURVEYS, TOP_THEMES, SENTIMENT_BREAKDOWN, CLOSED_LOOP } from "@/lib/seed";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { TOP_THEMES, SENTIMENT_BREAKDOWN, CLOSED_LOOP } from "@/lib/seed";
+import { useSurveys, addSurvey, editSurvey, deleteSurvey, toggleActive, type EditableSurvey, type SurveyChannel } from "@/lib/surveysStore";
 import { SentimentChip } from "@/components/brand/StatusChips";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { Plus, HeartHandshake } from "lucide-react";
+import { Plus, HeartHandshake, Pencil, Trash2, Settings2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const SENT_COLOR: Record<string, string> = {
   positive: "#17B26A",
@@ -16,6 +25,12 @@ const SENT_COLOR: Record<string, string> = {
 
 export default function VoC() {
   const { t, lang, pick } = useLocale();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const surveys = useSurveys();
+  const [manageOpen, setManageOpen] = useState(false);
+  const [editing, setEditing] = useState<EditableSurvey | null>(null);
+  const canManage = user?.role === "admin" || user?.role === "quality";
 
   return (
     <div>
@@ -24,10 +39,18 @@ export default function VoC() {
         title={t("nav.voc")}
         subtitle={lang === "ar" ? "اقرأ صوت المستفيدين وأغلق الحلقات" : "Listen to your customers and close the loop"}
         actions={
-          <Button size="sm">
-            <Plus size={14} className="me-1.5" />
-            {lang === "ar" ? "استبيان جديد" : "New survey"}
-          </Button>
+          <>
+            {canManage && (
+              <Button size="sm" variant="outline" onClick={() => setManageOpen(true)} data-testid="button-manage-surveys">
+                <Settings2 size={14} className="me-1.5" />
+                {t("voc.manage")}
+              </Button>
+            )}
+            <Button size="sm" onClick={() => { addSurvey(); toast({ title: t("voc.new") }); setManageOpen(true); }}>
+              <Plus size={14} className="me-1.5" />
+              {lang === "ar" ? "استبيان جديد" : "New survey"}
+            </Button>
+          </>
         }
       />
 
@@ -55,7 +78,7 @@ export default function VoC() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {SURVEYS.map((s) => (
+                  {surveys.map((s) => (
                     <tr key={s.id} className="hover:bg-muted/40 transition-colors">
                       <td className="px-4 py-3 font-medium">{pick(s.name)}</td>
                       <td className="px-4 py-3 text-muted-foreground">{s.type}</td>
@@ -71,7 +94,7 @@ export default function VoC() {
                       </td>
                       <td className="px-4 py-3 font-semibold tabular-nums">{s.score}</td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-200">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${s.isActive ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-slate-50 text-slate-600 ring-slate-200"}`}>
                           {pick(s.status)}
                         </span>
                       </td>
@@ -197,6 +220,107 @@ export default function VoC() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Manage surveys dialog */}
+      <Dialog open={manageOpen} onOpenChange={setManageOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{t("voc.editor.title")}</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-muted-foreground">{surveys.length} {lang === "ar" ? "استبيانات" : "surveys"}</p>
+            <Button size="sm" onClick={() => { addSurvey(); toast({ title: t("voc.new") }); }} data-testid="button-add-survey">
+              <Plus size={14} className="me-1.5" />
+              {t("voc.new")}
+            </Button>
+          </div>
+          <div className="max-h-[60vh] overflow-y-auto rounded-md border border-border">
+            <table className="w-full text-sm">
+              <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-muted/40">
+                <tr>
+                  <th className="text-start px-3 py-2">{lang === "ar" ? "الاسم" : "Name"}</th>
+                  <th className="text-start px-3 py-2">{t("voc.survey.channel")}</th>
+                  <th className="text-center px-3 py-2">{t("voc.survey.questions")}</th>
+                  <th className="text-center px-3 py-2">{t("voc.survey.active")}</th>
+                  <th className="text-end px-3 py-2"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {surveys.map((s) => (
+                  <tr key={s.id}>
+                    <td className="px-3 py-2">
+                      <div className="font-medium">{pick(s.name)}</div>
+                      <div className="text-[11px] text-muted-foreground">{pick(s.audience)}</div>
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">{s.channel}</td>
+                    <td className="px-3 py-2 text-center tabular-nums">{s.questions.length}</td>
+                    <td className="px-3 py-2 text-center">
+                      <Switch checked={s.isActive} onCheckedChange={() => toggleActive(s.id)} />
+                    </td>
+                    <td className="px-3 py-2 text-end">
+                      <Button size="sm" variant="ghost" onClick={() => setEditing(s)}><Pencil size={14} /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => { if (confirm(lang === "ar" ? "حذف الاستبيان؟" : "Delete survey?")) deleteSurvey(s.id); }}>
+                        <Trash2 size={14} className="text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setManageOpen(false)}>{t("common.close")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit a single survey */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{lang === "ar" ? "تحرير الاستبيان" : "Edit survey"}</DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">{lang === "ar" ? "الاسم (EN)" : "Name (EN)"}</Label>
+                <Input value={editing.name.en} onChange={(e) => setEditing({ ...editing, name: { ...editing.name, en: e.target.value } })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">{lang === "ar" ? "الاسم (AR)" : "Name (AR)"}</Label>
+                <Input dir="rtl" value={editing.name.ar} onChange={(e) => setEditing({ ...editing, name: { ...editing.name, ar: e.target.value } })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">{t("voc.survey.channel")}</Label>
+                <Select value={editing.channel} onValueChange={(v) => setEditing({ ...editing, channel: v as SurveyChannel })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="email">Email</SelectItem>
+                    <SelectItem value="sms">SMS</SelectItem>
+                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="in-app">In-app</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">{lang === "ar" ? "النوع" : "Type"}</Label>
+                <Select value={editing.type} onValueChange={(v) => setEditing({ ...editing, type: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CSAT">CSAT</SelectItem>
+                    <SelectItem value="NPS">NPS</SelectItem>
+                    <SelectItem value="CES">CES</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>{t("common.cancel")}</Button>
+            <Button onClick={() => { if (editing) { editSurvey(editing.id, editing); toast({ title: t("common.save") }); setEditing(null); } }}>{t("common.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

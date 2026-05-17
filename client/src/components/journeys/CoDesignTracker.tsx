@@ -5,7 +5,7 @@ import { useJourneys } from "@/contexts/JourneyContext";
 import { RequirementBadge } from "@/components/brand/RequirementBadge";
 import { cn } from "@/lib/utils";
 
-// Co-Design lifecycle tracker — DGA 5.18.3: beneficiaries participate across
+// Co-Design lifecycle tracker — DGA 5.18.3: customers participate across
 // Discover → Co-Design → Prototype → Pilot → Adopt for each service journey.
 // Reads live journeys from JourneyContext (Admin/Journeys CRUD propagates here).
 type Stage = "discover" | "co-design" | "prototype" | "pilot" | "adopt";
@@ -23,7 +23,7 @@ const STAGE_ORDER: Stage[] = ["discover", "co-design", "prototype", "pilot", "ad
 
 const STAGE_NOTES: Record<Stage, { ar: string; en: string }> = {
   discover: { ar: "مقابلات وتحليل احتياجات", en: "Discovery interviews & needs analysis" },
-  "co-design": { ar: "ورشة تصميم مشترك مع المستفيدين", en: "Co-design workshop with beneficiaries" },
+  "co-design": { ar: "ورشة تصميم مشترك مع المستفيدين", en: "Co-design workshop with customers" },
   prototype: { ar: "نموذج أولي للاختبار", en: "Clickable prototype in testing" },
   pilot: { ar: "تجربة تشغيلية محدودة", en: "Limited live pilot underway" },
   adopt: { ar: "تم تبني التصميم رسمياً", en: "Design formally adopted" },
@@ -99,7 +99,7 @@ export function CoDesignTracker() {
             <p className="text-[11px] text-muted-foreground mt-0.5">
               {lang === "ar"
                 ? "متابعة مشاركة المستفيدين في كل مرحلة من مراحل تطوير الخدمة."
-                : "Tracks beneficiary participation across every stage of service design."}
+                : "Tracks customer participation across every stage of service design."}
             </p>
           </div>
         </div>

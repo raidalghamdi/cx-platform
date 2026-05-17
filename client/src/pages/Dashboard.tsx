@@ -47,6 +47,9 @@ import {
   AlertTriangle,
   Sparkles,
   Flame,
+  Layers,
+  Repeat,
+  Database,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -170,14 +173,23 @@ export default function Dashboard() {
         }
       />
 
-      {/* KPI row */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      {/* KPI row — 9 KPIs across responsive grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-3">
         <Kpi label={t("kpi.csat.full")} value={KPI.csat.value.toFixed(1)} numeric={KPI.csat.value} decimals={1} unit="%" delta={KPI.csat.delta} Icon={Smile} tint="emerald" trend={CSAT_TREND.map(d=>d.v)} />
         <Kpi label={t("kpi.nps")} value={String(KPI.nps.value)} numeric={KPI.nps.value} delta={KPI.nps.delta} Icon={Gauge} tint="sky" trend={[28,30,33,35,36,38,40,41,42]} />
-        <Kpi label={t("kpi.ces.full")} value={KPI.ces.value.toFixed(1)} numeric={KPI.ces.value} decimals={1} unit="/ 5" delta={KPI.ces.delta} inverted Icon={Activity} tint="amber" trend={[3.4,3.3,3.2,3.1,3.0,3.0,2.9,2.9,2.8]} />
+        <Kpi label={t("kpi.responseTime")} value="2.4" numeric={2.4} decimals={1} unit=" h" delta={-0.3} inverted Icon={Timer} tint="sky" trend={[3.4,3.2,3.1,3.0,2.9,2.8,2.7,2.6,2.4]} />
+        <Kpi label={t("kpi.numServices")} value="12" numeric={12} delta={1} Icon={Layers} tint="emerald" trend={[7,8,8,9,10,10,11,11,12]} />
+        <Kpi label={t("kpi.completionRate")} value="87.4" numeric={87.4} decimals={1} unit="%" delta={1.2} Icon={CheckCircle2} tint="emerald" trend={[80,82,83,84,85,86,86.5,87,87.4]} />
+        <Kpi label={t("kpi.recurringPatterns")} value="6" numeric={6} delta={-1} inverted Icon={Repeat} tint="amber" trend={[10,9,9,8,8,7,7,7,6]} />
         <Kpi label={t("kpi.fcr.full")} value={KPI.fcr.value.toFixed(1)} numeric={KPI.fcr.value} decimals={1} unit="%" delta={KPI.fcr.delta} Icon={CheckCircle2} tint="emerald" trend={[64,65,66,67,68,69,70,70,71.3]} />
         <Kpi label={t("kpi.sla")} value={KPI.sla.value.toFixed(1)} numeric={KPI.sla.value} decimals={1} unit="%" delta={KPI.sla.delta} Icon={Timer} tint="violet" trend={[92,91.8,92.1,91.6,91.4,91.5,91.3,91.0,91.2]} />
         <Kpi label={t("kpi.open")} value={String(KPI.open.value)} numeric={KPI.open.value} delta={KPI.open.delta} inverted Icon={AlertCircle} tint="rose" trend={SLA_BREACH_TREND.map(d=>d.v)} />
+      </div>
+      <div className="mb-6">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/60 ring-1 ring-border text-[11px] font-medium text-muted-foreground">
+          <Database size={11} />
+          {t("source.dashboardKpi")}
+        </span>
       </div>
 
       <UsabilityPanel />
@@ -250,6 +262,12 @@ export default function Dashboard() {
         <Card className="lg:col-span-2 premium-card border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center gap-2"><BarChart3 size={14} className="text-primary" />{t("chart.complaintsByCategory")}</CardTitle>
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-muted/60 ring-1 ring-border text-[10.5px] font-medium text-muted-foreground">
+                <Database size={10} />
+                {t("source.complaintsByCat")}
+              </span>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="h-64">

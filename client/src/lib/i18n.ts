@@ -110,6 +110,104 @@ export const dict: Dict = {
   "kpi.sla": { en: "SLA Compliance", ar: "الالتزام بمستوى الخدمة" },
   "kpi.open": { en: "Open Complaints", ar: "الشكاوى المفتوحة" },
   "kpi.avgResponse": { en: "Avg. Response", ar: "متوسط الاستجابة" },
+  "kpi.responseTime": { en: "Response Time", ar: "زمن الاستجابة" },
+  "kpi.numServices": { en: "Number of Services", ar: "عدد الخدمات" },
+  "kpi.completionRate": { en: "Service Completion Rate", ar: "معدل إتمام الخدمة" },
+  "kpi.recurringPatterns": { en: "Recurring Patterns", ar: "الأنماط المتكررة" },
+
+  // Source pills (Round 2)
+  "source.dashboardKpi": { en: "Source: Strategic KPIs Excel · Last sync: 17 May 2026, 12:00", ar: "المصدر: ملف مؤشرات الاستراتيجية · آخر تحديث: 17 مايو 2026، 12:00" },
+  "source.complaintsByCat": { en: "Source: Monafasah+ (API) · Excel fallback", ar: "المصدر: منافسة+ (API) · بديل Excel" },
+  "source.complaintsPage": { en: "Source: Monafasah+ (API) · Excel/DB fallback supported", ar: "المصدر: منافسة+ (API) · يدعم بدائل Excel وقواعد البيانات" },
+  "source.apiReady": { en: "API-ready · Live wire to operational systems", ar: "جاهز للربط عبر API · توصيل مباشر بالأنظمة التشغيلية" },
+
+  // Complaints — Down Journey
+  "complaints.tab.all": { en: "All Complaints", ar: "كل الشكاوى" },
+  "complaints.tab.downJourney": { en: "Down Journey Focus", ar: "تركيز الرحلة المتعثرة" },
+  "complaints.downBanner": {
+    en: "These complaints occurred during a downward step in the customer journey and require focused remediation.",
+    ar: "وقعت هذه الشكاوى أثناء خطوة متعثّرة من رحلة المستفيد وتتطلب معالجة مركّزة.",
+  },
+  "complaints.stage.search": { en: "Service Search", ar: "البحث عن الخدمة" },
+  "complaints.stage.submit": { en: "Application Submission", ar: "تقديم الطلب" },
+  "complaints.stage.payment": { en: "Payment", ar: "السداد" },
+  "complaints.stage.tracking": { en: "Status Tracking", ar: "متابعة الحالة" },
+  "complaints.stageColumn": { en: "Journey Stage", ar: "مرحلة الرحلة" },
+  "complaints.stageBreakdown": { en: "Stage breakdown", ar: "توزيع المراحل" },
+  "complaints.statusChanged": { en: "Status changed", ar: "تم تغيير الحالة" },
+
+  // Inbox — channels banner
+  "inbox.channelsBanner": {
+    en: "Inbox messages are aggregated from email, WhatsApp Business, and the platform's Contact Us form. Configure channels in Admin → Contact Channels.",
+    ar: "تُجمَّع رسائل الصندوق من البريد الإلكتروني وواتساب للأعمال ونموذج «تواصل معنا» في المنصة. يمكن ضبط القنوات من «الإدارة ← قنوات التواصل».",
+  },
+  "admin.tab.contact": { en: "Contact Channels", ar: "قنوات التواصل" },
+  "admin.contact.whatsapp": { en: "WhatsApp number", ar: "رقم واتساب" },
+  "admin.contact.email": { en: "Info email", ar: "البريد الرسمي" },
+  "admin.contact.hours": { en: "Support hours", ar: "ساعات الدعم" },
+  "admin.contact.save": { en: "Save channels", ar: "حفظ القنوات" },
+
+  // VoC editable
+  "voc.manage": { en: "Manage Surveys", ar: "إدارة الاستبيانات" },
+  "voc.new": { en: "New Survey", ar: "استبيان جديد" },
+  "voc.editor.title": { en: "Survey editor", ar: "محرر الاستبيانات" },
+  "voc.survey.channel": { en: "Channel", ar: "القناة" },
+  "voc.survey.questions": { en: "Questions", ar: "الأسئلة" },
+  "voc.survey.active": { en: "Active", ar: "نشط" },
+  "voc.survey.draft": { en: "Draft", ar: "مسودة" },
+  "voc.survey.toggle": { en: "Activate", ar: "تفعيل" },
+
+  // KB editor
+  "kb.new": { en: "New Article", ar: "مقال جديد" },
+  "kb.edit": { en: "Edit", ar: "تحرير" },
+  "kb.delete": { en: "Delete", ar: "حذف" },
+  "kb.title.en": { en: "Title (English)", ar: "العنوان (إنجليزي)" },
+  "kb.title.ar": { en: "Title (Arabic)", ar: "العنوان (عربي)" },
+  "kb.body.en": { en: "Body (English)", ar: "النص (إنجليزي)" },
+  "kb.body.ar": { en: "Body (Arabic)", ar: "النص (عربي)" },
+  "kb.tags": { en: "Tags (comma separated)", ar: "وسوم (مفصولة بفواصل)" },
+  "kb.newCat": { en: "+ New category", ar: "+ فئة جديدة" },
+
+  // Programme — MS Project import/export
+  "prog.importMsp": { en: "Import MS Project", ar: "استيراد MS Project" },
+  "prog.exportMsp": { en: "Export MS Project XML", ar: "تصدير MS Project XML" },
+  "prog.importMpp": {
+    en: "MPP binary format requires server-side parsing. Please export to MS Project XML format and re-import.",
+    ar: "صيغة MPP الثنائية تتطلب معالجة من الخادم. الرجاء التصدير إلى MS Project XML ثم الاستيراد.",
+  },
+  "prog.importDone": { en: "Imported", ar: "تم الاستيراد" },
+  "prog.importFailed": { en: "Import failed", ar: "فشل الاستيراد" },
+
+  // Login — demo flag caption
+  "login.demoCaption": {
+    en: "Demo accounts visible during pilot — will be hidden in production.",
+    ar: "حسابات تجريبية تظهر خلال مرحلة التجريب — ستُخفى في النسخة الإنتاجية.",
+  },
+
+  // Admin — role permissions matrix
+  "admin.tab.rolePerms": { en: "Role Permissions", ar: "صلاحيات الأدوار" },
+  "admin.rolePerms.intro": {
+    en: "Choose which pages each role can access. Admin always has full access.",
+    ar: "اختر الصفحات التي يمكن لكل دور الوصول إليها. مسؤول النظام يملك صلاحية كاملة دائماً.",
+  },
+  "admin.rolePerms.role": { en: "Role / Page", ar: "الدور / الصفحة" },
+  "admin.rolePerms.reset": { en: "Reset to defaults", ar: "إعادة للضبط الافتراضي" },
+  "admin.rolePerms.save": { en: "Save permissions", ar: "حفظ الصلاحيات" },
+
+  // About — editor
+  "about.edit": { en: "Edit Page", ar: "تحرير الصفحة" },
+  "about.editor.title": { en: "About editor", ar: "محرر الصفحة" },
+
+  // Notifications dropdown
+  "notif.title": { en: "Notifications", ar: "الإشعارات" },
+  "notif.markAll": { en: "Mark all as read", ar: "تعليم الكل كمقروء" },
+  "notif.empty": { en: "No notifications", ar: "لا توجد إشعارات" },
+  "notif.viewAll": { en: "View all", ar: "عرض الكل" },
+  "notif.sla": { en: "SLA breach on CX-2150", ar: "تجاوز SLA في CX-2150" },
+  "notif.newComplaint": { en: "New complaint received via WhatsApp", ar: "شكوى جديدة عبر واتساب" },
+  "notif.survey": { en: "New survey response — Branch experience", ar: "ردّ استبيان جديد — تجربة الفرع" },
+  "notif.kb": { en: "Knowledge article published — Nafath sign-in", ar: "نشر مقال جديد — تسجيل الدخول عبر نفاذ" },
+  "notif.audit": { en: "Audit chain verified — 0 mismatches", ar: "تم التحقق من سلسلة التدقيق — 0 اختلافات" },
 
   // Charts
   "chart.csatTrend": { en: "CSAT trend — last 12 months", ar: "اتجاه رضا المستفيدين — آخر 12 شهراً" },

@@ -1,87 +1,154 @@
 import { useMemo, useState } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { PageHeader } from "@/components/brand/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ARTICLES, type Article } from "@/lib/seed";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  useArticles,
+  addArticle,
+  updateArticle,
+  deleteArticle,
+  getCategories,
+  type KbArticle,
+} from "@/lib/kbStore";
 import {
   Search,
-  Wrench,
-  CreditCard,
-  UserCircle2,
-  Cpu,
-  Shield,
+  BookOpen,
   ChevronRight,
   ChevronLeft,
   ThumbsUp,
   ThumbsDown,
-  BookOpen,
-  ArrowLeft,
+  Pencil,
+  Trash2,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
-const CAT_META: Record<string, { Icon: any; key: string }> = {
-  services: { Icon: Wrench, key: "kb.cat.services" },
-  billing: { Icon: CreditCard, key: "kb.cat.billing" },
-  account: { Icon: UserCircle2, key: "kb.cat.account" },
-  technical: { Icon: Cpu, key: "kb.cat.technical" },
-  policy: { Icon: Shield, key: "kb.cat.policy" },
+type DraftArticle = {
+  id?: string;
+  title: { en: string; ar: string };
+  category: { en: string; ar: string };
+  body: { en: string; ar: string };
+  tags: string;
+};
+
+const EMPTY: DraftArticle = {
+  title: { en: "", ar: "" },
+  category: { en: "Services", ar: "الخدمات" },
+  body: { en: "", ar: "" },
+  tags: "",
 };
 
 export default function KB() {
   const { t, lang, pick, isRTL } = useLocale();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const articles = useArticles();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | null>(null);
-  const [active, setActive] = useState<Article | null>(null);
+  const [active, setActive] = useState<KbArticle | null>(null);
+  const [editing, setEditing] = useState<DraftArticle | null>(null);
+  const [newCatOpen, setNewCatOpen] = useState(false);
+  const [newCat, setNewCat] = useState({ en: "", ar: "" });
 
+  const canEdit = user?.role === "admin" || user?.role === "quality";
   const Chev = isRTL ? ChevronLeft : ChevronRight;
 
   const filtered = useMemo(() => {
-    return ARTICLES.filter((a) => {
-      if (cat && a.category !== cat) return false;
+    return articles.filter((a) => {
+      if (cat && a.category.en !== cat) return false;
       if (q) {
-        const hay = `${a.title.ar} ${a.title.en}`.toLowerCase();
+        const hay = `${a.title.ar} ${a.title.en} ${a.tags.join(" ")}`.toLowerCase();
         if (!hay.includes(q.toLowerCase())) return false;
       }
       return true;
     });
-  }, [q, cat]);
+  }, [q, cat, articles]);
+
+  const categories = useMemo(() => getCategories(), [articles]);
+
+  function openNew() {
+    setEditing({ ...EMPTY, category: categories[0] ?? EMPTY.category });
+  }
+
+  function openEdit(a: KbArticle) {
+    setEditing({
+      id: a.id,
+      title: { ...a.title },
+      category: { ...a.category },
+      body: { ...a.body },
+      tags: a.tags.join(", "),
+    });
+  }
+
+  function saveDraft() {
+    if (!editing) return;
+    const tagsArr = editing.tags.split(",").map((s) => s.trim()).filter(Boolean);
+    if (editing.id) {
+      updateArticle(editing.id, {
+        title: editing.title,
+        category: editing.category,
+        body: editing.body,
+        tags: tagsArr,
+      });
+      toast({ title: lang === "ar" ? "تم التحديث" : "Updated" });
+    } else {
+      addArticle({
+        title: editing.title,
+        category: editing.category,
+        body: editing.body,
+        tags: tagsArr,
+      });
+      toast({ title: lang === "ar" ? "تمت الإضافة" : "Created" });
+    }
+    setEditing(null);
+  }
+
+  function confirmDelete(a: KbArticle) {
+    if (!confirm(lang === "ar" ? "حذف المقال؟" : "Delete article?")) return;
+    deleteArticle(a.id);
+    if (active?.id === a.id) setActive(null);
+    toast({ title: lang === "ar" ? "تم الحذف" : "Deleted" });
+  }
 
   if (active) {
     return (
       <div>
         <PageHeader
           title={pick(active.title)}
-          subtitle={t("kb.cat." + active.category) + " · " + active.updated}
+          subtitle={pick(active.category) + " · " + active.updatedAt}
           actions={
-            <Button variant="outline" size="sm" onClick={() => setActive(null)}>
-              {lang === "ar" ? "العودة للقائمة" : "Back to list"}
-            </Button>
+            <>
+              {canEdit && (
+                <Button size="sm" variant="outline" onClick={() => openEdit(active)}>
+                  <Pencil size={14} className="me-1.5" />
+                  {t("kb.edit")}
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => setActive(null)}>
+                {lang === "ar" ? "العودة للقائمة" : "Back to list"}
+              </Button>
+            </>
           }
         />
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           <article className="prose prose-slate max-w-none text-[15px] leading-relaxed">
-            <p>{pick(active.body)}</p>
-            <h3 className="text-base font-semibold mt-6">{lang === "ar" ? "الخطوات" : "Steps"}</h3>
-            <ol>
-              <li>{lang === "ar" ? "الدخول إلى تطبيق الخدمة." : "Open the service app."}</li>
-              <li>{lang === "ar" ? "تحديد الخدمة المطلوبة." : "Select the required service."}</li>
-              <li>{lang === "ar" ? "إكمال بيانات الطلب." : "Complete the request details."}</li>
-              <li>{lang === "ar" ? "تأكيد الإرسال." : "Confirm submission."}</li>
-            </ol>
-            <h3 className="text-base font-semibold mt-6">{lang === "ar" ? "مقالات ذات صلة" : "Related articles"}</h3>
-            <ul>
-              {ARTICLES.filter((a) => a.id !== active.id && a.category === active.category).slice(0, 3).map((a) => (
-                <li key={a.id}>
-                  <button className="text-primary hover:underline" onClick={() => setActive(a)}>
-                    {pick(a.title)}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <p style={{ whiteSpace: "pre-wrap" }}>{pick(active.body)}</p>
+            {active.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-4">
+                {active.tags.map((t) => (
+                  <span key={t} className="inline-flex items-center text-[11px] rounded-full bg-muted px-2 py-0.5">#{t}</span>
+                ))}
+              </div>
+            )}
           </article>
-
           <aside className="space-y-4">
             <Card className="shadow-card">
               <CardContent className="p-4">
@@ -90,20 +157,35 @@ export default function KB() {
                   <Button variant="outline" size="sm" className="flex-1"><ThumbsUp size={14} className="me-1.5" />{t("kb.yes")}</Button>
                   <Button variant="outline" size="sm" className="flex-1"><ThumbsDown size={14} className="me-1.5" />{t("kb.no")}</Button>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-3 text-center">
-                  <div>
-                    <p className="text-lg font-semibold tabular-nums">{active.views.toLocaleString()}</p>
-                    <p className="text-[11px] text-muted-foreground">{t("kb.views")}</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-semibold tabular-nums text-emerald-600">{active.helpful}%</p>
-                    <p className="text-[11px] text-muted-foreground">{t("kb.helpful")}</p>
-                  </div>
+                <div className="mt-4 text-center">
+                  <p className="text-lg font-semibold tabular-nums">{active.views.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">{t("kb.views")}</p>
                 </div>
               </CardContent>
             </Card>
           </aside>
         </div>
+
+        {editing && (
+          <EditDialog
+            editing={editing}
+            setEditing={setEditing}
+            saveDraft={saveDraft}
+            categories={categories}
+            newCatOpen={newCatOpen}
+            setNewCatOpen={setNewCatOpen}
+            newCat={newCat}
+            setNewCat={setNewCat}
+            onConfirmNewCat={() => {
+              if (!newCat.en.trim()) return;
+              setEditing({ ...editing, category: newCat });
+              setNewCat({ en: "", ar: "" });
+              setNewCatOpen(false);
+            }}
+            t={t}
+            lang={lang}
+          />
+        )}
       </div>
     );
   }
@@ -114,9 +196,16 @@ export default function KB() {
         Icon={BookOpen}
         title={t("nav.kb")}
         subtitle={lang === "ar" ? "أدلة وسياسات للمستفيدين والموظفين" : "Guides and policies for customers and staff"}
+        actions={
+          canEdit ? (
+            <Button size="sm" onClick={openNew} data-testid="button-new-article">
+              <Plus size={14} className="me-1.5" />
+              {t("kb.new")}
+            </Button>
+          ) : undefined
+        }
       />
 
-      {/* Hero search */}
       <Card className="shadow-card mb-6 overflow-hidden">
         <CardContent
           className="p-8 lg:p-12 text-center relative"
@@ -140,7 +229,7 @@ export default function KB() {
         </CardContent>
       </Card>
 
-      {/* Category tiles */}
+      {/* Dynamic category tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
         <button
           onClick={() => setCat(null)}
@@ -154,28 +243,24 @@ export default function KB() {
           </span>
           <span className="text-sm font-medium">{lang === "ar" ? "كل المقالات" : "All articles"}</span>
         </button>
-        {Object.entries(CAT_META).map(([k, m]) => {
-          const count = ARTICLES.filter((a) => a.category === k).length;
+        {categories.map((c) => {
+          const count = articles.filter((a) => a.category.en === c.en).length;
           return (
             <button
-              key={k}
-              onClick={() => setCat(k)}
+              key={c.en}
+              onClick={() => setCat(c.en)}
               className={cn(
                 "rounded-xl border bg-card p-4 text-start hover:shadow-card-hover transition-shadow",
-                cat === k ? "border-primary ring-1 ring-primary/30" : "border-border",
+                cat === c.en ? "border-primary ring-1 ring-primary/30" : "border-border",
               )}
             >
-              <span className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-2.5">
-                <m.Icon size={18} />
-              </span>
-              <p className="text-sm font-semibold">{t(m.key)}</p>
+              <p className="text-sm font-semibold">{pick(c)}</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">{count} {lang === "ar" ? "مقالات" : "articles"}</p>
             </button>
           );
         })}
       </div>
 
-      {/* Article list */}
       <Card className="shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[640px]">
@@ -184,41 +269,157 @@ export default function KB() {
                 <th className="text-start px-4 py-3 font-medium">{lang === "ar" ? "العنوان" : "Title"}</th>
                 <th className="text-start px-4 py-3 font-medium">{t("common.category")}</th>
                 <th className="text-start px-4 py-3 font-medium">{t("kb.views")}</th>
-                <th className="text-start px-4 py-3 font-medium">{t("kb.helpful")}</th>
                 <th className="text-start px-4 py-3 font-medium">{t("common.lastUpdated")}</th>
-                <th className="text-start px-4 py-3 font-medium">{t("common.status")}</th>
+                <th className="text-start px-4 py-3 font-medium">{lang === "ar" ? "وسوم" : "Tags"}</th>
                 <th></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.map((a) => (
-                <tr key={a.id} className="hover:bg-muted/40 cursor-pointer transition-colors" onClick={() => setActive(a)}>
-                  <td className="px-4 py-3 font-medium">{pick(a.title)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{t("kb.cat." + a.category)}</td>
+                <tr key={a.id} className="hover:bg-muted/40 transition-colors">
+                  <td className="px-4 py-3 font-medium cursor-pointer" onClick={() => setActive(a)}>{pick(a.title)}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{pick(a.category)}</td>
                   <td className="px-4 py-3 tabular-nums">{a.views.toLocaleString()}</td>
-                  <td className="px-4 py-3 tabular-nums text-emerald-600">{a.helpful}%</td>
-                  <td className="px-4 py-3 text-muted-foreground tabular-nums">{a.updated}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={cn(
-                        "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset",
-                        a.status === "published" && "bg-emerald-50 text-emerald-700 ring-emerald-200",
-                        a.status === "draft" && "bg-slate-50 text-slate-600 ring-slate-200",
-                        a.status === "review" && "bg-amber-50 text-amber-700 ring-amber-200",
-                      )}
-                    >
-                      {a.status}
-                    </span>
-                  </td>
+                  <td className="px-4 py-3 text-muted-foreground tabular-nums">{a.updatedAt}</td>
+                  <td className="px-4 py-3 text-[11px] text-muted-foreground truncate max-w-[180px]">{a.tags.join(", ")}</td>
                   <td className="px-2 py-3 text-end">
-                    <Chev size={16} className="text-muted-foreground inline-block" />
+                    {canEdit ? (
+                      <div className="inline-flex items-center gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => openEdit(a)} data-testid={`button-edit-article-${a.id}`}>
+                          <Pencil size={14} />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => confirmDelete(a)}>
+                          <Trash2 size={14} className="text-destructive" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Chev size={16} className="text-muted-foreground inline-block" />
+                    )}
                   </td>
                 </tr>
               ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">{t("table.empty")}</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </Card>
+
+      {editing && (
+        <EditDialog
+          editing={editing}
+          setEditing={setEditing}
+          saveDraft={saveDraft}
+          categories={categories}
+          newCatOpen={newCatOpen}
+          setNewCatOpen={setNewCatOpen}
+          newCat={newCat}
+          setNewCat={setNewCat}
+          onConfirmNewCat={() => {
+            if (!newCat.en.trim()) return;
+            setEditing({ ...editing, category: newCat });
+            setNewCat({ en: "", ar: "" });
+            setNewCatOpen(false);
+          }}
+          t={t}
+          lang={lang}
+        />
+      )}
     </div>
+  );
+}
+
+function EditDialog({
+  editing, setEditing, saveDraft, categories, newCatOpen, setNewCatOpen,
+  newCat, setNewCat, onConfirmNewCat, t, lang,
+}: {
+  editing: DraftArticle;
+  setEditing: (d: DraftArticle | null) => void;
+  saveDraft: () => void;
+  categories: { en: string; ar: string }[];
+  newCatOpen: boolean;
+  setNewCatOpen: (v: boolean) => void;
+  newCat: { en: string; ar: string };
+  setNewCat: (v: { en: string; ar: string }) => void;
+  onConfirmNewCat: () => void;
+  t: (k: string) => string;
+  lang: "ar" | "en";
+}) {
+  return (
+    <Dialog open onOpenChange={(o) => !o && setEditing(null)}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{editing.id ? t("kb.edit") : t("kb.new")}</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">{t("kb.title.en")}</Label>
+            <Input value={editing.title.en} onChange={(e) => setEditing({ ...editing, title: { ...editing.title, en: e.target.value } })} />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">{t("kb.title.ar")}</Label>
+            <Input dir="rtl" value={editing.title.ar} onChange={(e) => setEditing({ ...editing, title: { ...editing.title, ar: e.target.value } })} />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-xs">{t("common.category")}</Label>
+            <div className="flex gap-2">
+              <Select value={editing.category.en} onValueChange={(v) => {
+                const c = categories.find((x) => x.en === v);
+                if (c) setEditing({ ...editing, category: c });
+              }}>
+                <SelectTrigger className="flex-1"><SelectValue>{lang === "ar" ? editing.category.ar : editing.category.en}</SelectValue></SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c.en} value={c.en}>{lang === "ar" ? c.ar : c.en}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" variant="outline" onClick={() => setNewCatOpen(true)}>{t("kb.newCat")}</Button>
+            </div>
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-xs">{t("kb.body.en")}</Label>
+            <Textarea rows={4} value={editing.body.en} onChange={(e) => setEditing({ ...editing, body: { ...editing.body, en: e.target.value } })} />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-xs">{t("kb.body.ar")}</Label>
+            <Textarea rows={4} dir="rtl" value={editing.body.ar} onChange={(e) => setEditing({ ...editing, body: { ...editing.body, ar: e.target.value } })} />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-xs">{t("kb.tags")}</Label>
+            <Input value={editing.tags} onChange={(e) => setEditing({ ...editing, tags: e.target.value })} placeholder="onboarding, services" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setEditing(null)}>{t("common.cancel")}</Button>
+          <Button onClick={saveDraft}>{t("common.save")}</Button>
+        </DialogFooter>
+
+        <Dialog open={newCatOpen} onOpenChange={setNewCatOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t("kb.newCat")}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs">EN</Label>
+                <Input value={newCat.en} onChange={(e) => setNewCat({ ...newCat, en: e.target.value })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">AR</Label>
+                <Input dir="rtl" value={newCat.ar} onChange={(e) => setNewCat({ ...newCat, ar: e.target.value })} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setNewCatOpen(false)}>{t("common.cancel")}</Button>
+              <Button onClick={onConfirmNewCat}>{t("common.save")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </DialogContent>
+    </Dialog>
   );
 }

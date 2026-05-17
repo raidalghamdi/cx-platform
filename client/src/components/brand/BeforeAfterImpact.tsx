@@ -5,7 +5,7 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { RequirementBadge } from "@/components/brand/RequirementBadge";
 
 // Before/After improvement comparison — DGA 5.20.4: organisations must
-// demonstrate that beneficiary feedback led to measurable improvement.
+// demonstrate that customer feedback led to measurable improvement.
 type Metric = {
   key: string;
   label: { ar: string; en: string };
@@ -57,7 +57,7 @@ export function BeforeAfterImpact() {
             <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
               {lang === "ar"
                 ? "أثر مبادرات التحسين المنفذة بناءً على «صوت المستفيد» خلال الستة أشهر الأخيرة."
-                : "Impact of improvement initiatives executed from Voice-of-Beneficiary input over the last 6 months."}
+                : "Impact of improvement initiatives executed from Voice-of-Customer input over the last 6 months."}
             </p>
           </div>
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-700">

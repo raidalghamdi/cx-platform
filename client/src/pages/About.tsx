@@ -1,7 +1,16 @@
+import { useState } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { PageHeader } from "@/components/brand/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useAbout, setAbout, resetAbout } from "@/lib/aboutStore";
+import { useToast } from "@/hooks/use-toast";
+import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Users,
@@ -62,11 +71,29 @@ const OUT_OF_SCOPE: { key: string; rationale: string; future: string }[] = [
 ];
 
 export default function About() {
-  const { t, lang, isRTL } = useLocale();
+  const { t, lang, isRTL, pick } = useLocale();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const aboutContent = useAbout();
+  const [edit, setEdit] = useState(false);
+  const [draft, setDraft] = useState(aboutContent);
+  const canEdit = user?.role === "admin";
 
   return (
     <>
-      <PageHeader Icon={Info} title={t("about.title")} subtitle={t("about.subtitle")} />
+      <PageHeader
+        Icon={Info}
+        title={t("about.title")}
+        subtitle={t("about.subtitle")}
+        actions={
+          canEdit ? (
+            <Button size="sm" variant="outline" onClick={() => { setDraft(aboutContent); setEdit(true); }} data-testid="button-edit-about">
+              <Pencil size={14} className="me-1.5" />
+              {t("about.edit")}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {/* Hero / Vision */}
       <Card className="shadow-card overflow-hidden mb-8 border-primary/20">
@@ -82,7 +109,7 @@ export default function About() {
               {t("about.purpose")}
             </h2>
             <p className={cn("mt-4 text-sm lg:text-base text-muted-foreground max-w-3xl leading-relaxed", isRTL && "text-right")}>
-              {t("about.purposeBody")}
+              {pick(aboutContent.hero)}
             </p>
             <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="rounded-lg border border-border bg-card/85 backdrop-blur-sm px-4 py-3 card-lift">
@@ -211,6 +238,129 @@ export default function About() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Mission / Vision / Values / Milestones — editable from store */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-10">
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="text-sm font-semibold">{lang === "ar" ? "الرسالة" : "Mission"}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className={cn("text-sm text-foreground leading-relaxed", isRTL && "text-right")}>{pick(aboutContent.mission)}</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="text-sm font-semibold">{lang === "ar" ? "الرؤية" : "Vision"}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className={cn("text-sm text-foreground leading-relaxed", isRTL && "text-right")}>{pick(aboutContent.vision)}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="shadow-card mb-10">
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">{lang === "ar" ? "القيم" : "Values"}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {aboutContent.values.map((v, i) => (
+              <Badge key={i} variant="secondary" className="text-[11px] font-medium">{pick(v)}</Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-card mb-10">
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">{lang === "ar" ? "محطات" : "Milestones"}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ol className="relative ms-3 border-s border-border space-y-3">
+            {aboutContent.milestones.map((m, i) => (
+              <li key={i} className="ps-4 relative">
+                <span className={`absolute ${isRTL ? "right-[-5px]" : "left-[-5px]"} mt-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-card`} />
+                <p className="text-[11px] text-muted-foreground tabular-nums font-mono">{m.year}</p>
+                <p className="text-sm font-medium">{pick(m.title)}</p>
+              </li>
+            ))}
+          </ol>
+        </CardContent>
+      </Card>
+
+      {/* About edit dialog */}
+      <Dialog open={edit} onOpenChange={setEdit}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("about.editor.title")}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Hero (EN)</Label>
+                <Textarea rows={3} value={draft.hero.en} onChange={(e) => setDraft({ ...draft, hero: { ...draft.hero, en: e.target.value } })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Hero (AR)</Label>
+                <Textarea rows={3} dir="rtl" value={draft.hero.ar} onChange={(e) => setDraft({ ...draft, hero: { ...draft.hero, ar: e.target.value } })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Mission (EN)</Label>
+                <Textarea rows={2} value={draft.mission.en} onChange={(e) => setDraft({ ...draft, mission: { ...draft.mission, en: e.target.value } })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Mission (AR)</Label>
+                <Textarea rows={2} dir="rtl" value={draft.mission.ar} onChange={(e) => setDraft({ ...draft, mission: { ...draft.mission, ar: e.target.value } })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Vision (EN)</Label>
+                <Textarea rows={2} value={draft.vision.en} onChange={(e) => setDraft({ ...draft, vision: { ...draft.vision, en: e.target.value } })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Vision (AR)</Label>
+                <Textarea rows={2} dir="rtl" value={draft.vision.ar} onChange={(e) => setDraft({ ...draft, vision: { ...draft.vision, ar: e.target.value } })} />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">{lang === "ar" ? "القيم (EN — سطر لكل قيمة)" : "Values (EN — one per line)"}</Label>
+              <Textarea
+                rows={5}
+                value={draft.values.map((v) => v.en).join("\n")}
+                onChange={(e) => {
+                  const lines = e.target.value.split("\n");
+                  setDraft({
+                    ...draft,
+                    values: lines.map((en, i) => ({ en, ar: draft.values[i]?.ar ?? en })),
+                  });
+                }}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">{lang === "ar" ? "القيم (AR — سطر لكل قيمة)" : "Values (AR — one per line)"}</Label>
+              <Textarea
+                rows={5}
+                dir="rtl"
+                value={draft.values.map((v) => v.ar).join("\n")}
+                onChange={(e) => {
+                  const lines = e.target.value.split("\n");
+                  setDraft({
+                    ...draft,
+                    values: draft.values.map((v, i) => ({ en: v.en, ar: lines[i] ?? v.ar })),
+                  });
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { resetAbout(); setEdit(false); toast({ title: lang === "ar" ? "أعيد للضبط الافتراضي" : "Reset to defaults" }); }}>
+              {lang === "ar" ? "افتراضي" : "Reset"}
+            </Button>
+            <Button variant="outline" onClick={() => setEdit(false)}>{t("common.cancel")}</Button>
+            <Button onClick={() => { setAbout(draft); setEdit(false); toast({ title: t("common.save") }); }}>{t("common.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Supporting documents */}
       <Card className="shadow-card">

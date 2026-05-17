@@ -10,6 +10,11 @@ import { Globe, ChevronRight, ChevronLeft, ShieldCheck, Sparkles, Heart, Activit
 import { cn } from "@/lib/utils";
 import { HeroPattern } from "@/components/brand/HeroPattern";
 
+// Feature flag: when VITE_SHOW_DEMO_ACCOUNTS="false", hide the demo-account
+// panel. To flip in production, set the env var in your Vercel project.
+const SHOW_DEMO_ACCOUNTS =
+  (import.meta.env.VITE_SHOW_DEMO_ACCOUNTS ?? "true").toLowerCase() !== "false";
+
 export default function Login() {
   const { signIn, user } = useAuth();
   const { t, lang, toggle, isRTL } = useLocale();
@@ -170,7 +175,8 @@ export default function Login() {
               </Button>
             </form>
 
-            {/* Demo accounts card */}
+            {/* Demo accounts card — toggle via VITE_SHOW_DEMO_ACCOUNTS */}
+            {SHOW_DEMO_ACCOUNTS && (
             <section className="premium-card p-1.5">
               <div className="px-3 pt-2.5 pb-2 flex items-start justify-between gap-3">
                 <div className="space-y-0.5">
@@ -212,7 +218,11 @@ export default function Login() {
                   </li>
                 ))}
               </ul>
+              <p className="text-[10.5px] text-muted-foreground px-3 pb-2 pt-1.5 leading-snug">
+                {t("login.demoCaption")}
+              </p>
             </section>
+            )}
 
             <p className="text-[11px] text-muted-foreground text-center">
               {t("login.contactSupport")}

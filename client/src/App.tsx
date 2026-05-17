@@ -5,7 +5,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LocaleProvider } from "@/contexts/LocaleContext";
-import { AuthProvider, useAuth, ROLE_NAV } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { isAllowed } from "@/lib/rolePermissionsStore";
 import { JourneyProvider } from "@/contexts/JourneyContext";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AppShell } from "@/components/shell/AppShell";
@@ -33,10 +34,8 @@ import NotFound from "@/pages/not-found";
 function Guard({ path, navKey, children }: { path: string; navKey?: string; children: React.ReactNode }) {
   const { user } = useAuth();
   if (!user) return <Redirect to="/login" />;
-  const allowed = new Set(ROLE_NAV[user.role]);
-  // Some routes are dynamic (e.g. /journeys/:id) — gate by base navKey instead of exact path.
   const gateKey = navKey ?? path;
-  if (!allowed.has(gateKey)) return <AppShell><AccessDenied /></AppShell>;
+  if (!isAllowed(user.role, gateKey)) return <AppShell><AccessDenied /></AppShell>;
   return <AppShell>{children}</AppShell>;
 }
 

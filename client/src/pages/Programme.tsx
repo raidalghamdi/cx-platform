@@ -31,7 +31,18 @@ import {
   YAxis,
   Legend,
 } from "recharts";
-import { CalendarRange, AlertCircle, DollarSign, GraduationCap, ArrowUp, CheckCircle2, AlertTriangle, XCircle, ClipboardList } from "lucide-react";
+import { CalendarRange, AlertCircle, DollarSign, GraduationCap, ArrowUp, CheckCircle2, AlertTriangle, XCircle, ClipboardList, Upload, Download } from "lucide-react";
+import { useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import {
+  useProgrammeTasks,
+  setTasks as setProgrammeTasks,
+  parseMspXml,
+  parseCsv,
+  serialiseMspXml,
+} from "@/lib/programmeStore";
 
 // Compute month index for gantt positioning.
 const MONTHS = (() => {
@@ -646,11 +657,110 @@ function ChangeTab() {
 
 // ─────────────────────────────────────────────────────────────────────
 export default function Programme() {
-  const { t } = useLocale();
+  const { t, lang } = useLocale();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const tasks = useProgrammeTasks();
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const canImport = user?.role === "admin";
+
+  function onImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const name = f.name.toLowerCase();
+    if (name.endsWith(".mpp")) {
+      toast({ title: t("prog.importFailed"), description: t("prog.importMpp") });
+      e.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = String(reader.result || "");
+        const parsed = name.endsWith(".csv") ? parseCsv(text) : parseMspXml(text);
+        setProgrammeTasks(parsed);
+        toast({ title: t("prog.importDone"), description: `${parsed.length} ${lang === "ar" ? "مهمة" : "tasks"}` });
+      } catch (err: any) {
+        toast({ title: t("prog.importFailed"), description: err?.message ?? "" });
+      }
+    };
+    reader.readAsText(f);
+    e.target.value = "";
+  }
+
+  function onExport() {
+    const xml = serialiseMspXml(tasks);
+    const blob = new Blob([xml], { type: "application/xml" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "cx-programme.xml";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
 
   return (
     <>
-      <PageHeader Icon={ClipboardList} title={t("prog.title")} subtitle={t("prog.subtitle")} />
+      <PageHeader
+        Icon={ClipboardList}
+        title={t("prog.title")}
+        subtitle={t("prog.subtitle")}
+        actions={
+          <>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".xml,.mpp,.csv"
+              className="hidden"
+              onChange={onImport}
+              data-testid="input-msp-import"
+            />
+            {canImport && (
+              <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} data-testid="button-import-msp">
+                <Upload size={14} className="me-1.5" />
+                {t("prog.importMsp")}
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={onExport} data-testid="button-export-msp">
+              <Download size={14} className="me-1.5" />
+              {t("prog.exportMsp")}
+            </Button>
+          </>
+        }
+      />
+
+      {tasks.length > 0 && (
+        <div className="mb-4 rounded-lg border border-border p-3 bg-card">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+            {lang === "ar" ? "مهام MS Project الحالية" : "Current MS Project tasks"} · {tasks.length}
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="text-start px-2 py-1">{lang === "ar" ? "المهمة" : "Task"}</th>
+                  <th className="text-start px-2 py-1">{lang === "ar" ? "البداية" : "Start"}</th>
+                  <th className="text-start px-2 py-1">{lang === "ar" ? "النهاية" : "Finish"}</th>
+                  <th className="text-end px-2 py-1">{lang === "ar" ? "أيام" : "Days"}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {tasks.slice(0, 6).map((tk) => (
+                  <tr key={tk.id}>
+                    <td className="px-2 py-1 font-medium">{tk.name}</td>
+                    <td className="px-2 py-1 tabular-nums text-muted-foreground">{tk.start}</td>
+                    <td className="px-2 py-1 tabular-nums text-muted-foreground">{tk.finish}</td>
+                    <td className="px-2 py-1 tabular-nums text-end">{tk.durationDays}</td>
+                  </tr>
+                ))}
+                {tasks.length > 6 && (
+                  <tr><td colSpan={4} className="px-2 py-1 text-center text-[10px] text-muted-foreground">+ {tasks.length - 6} {lang === "ar" ? "مهام إضافية" : "more tasks"}</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <Tabs defaultValue="roadmap">
         <TabsList className="h-auto w-full justify-start overflow-x-auto no-scrollbar p-1">
           <TabsTrigger value="roadmap" className="gap-1.5 whitespace-nowrap shrink-0"><CalendarRange size={13} />{t("prog.tab.roadmap")}</TabsTrigger>

@@ -9,11 +9,13 @@ import {
   SentimentChip,
 } from "@/components/brand/StatusChips";
 import { CONVERSATIONS, SUGGESTED_REPLIES } from "@/lib/seed";
-import { Send, Sparkles, Paperclip, Inbox as InboxIcon } from "lucide-react";
+import { useChannels } from "@/lib/channelsStore";
+import { Send, Sparkles, Paperclip, Inbox as InboxIcon, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Inbox() {
   const { t, lang, pick, isRTL } = useLocale();
+  const channels = useChannels();
   const [activeId, setActiveId] = useState(CONVERSATIONS[0].id);
   const [draft, setDraft] = useState("");
   const [mobilePane, setMobilePane] = useState<"queue" | "thread" | "customer">("queue");
@@ -26,6 +28,16 @@ export default function Inbox() {
         title={t("nav.inbox")}
         subtitle={lang === "ar" ? "محادثات نشطة عبر القنوات" : "Active conversations across channels"}
       />
+
+      <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50/60 p-3 flex items-start gap-2.5">
+        <Info size={16} className="text-sky-700 mt-0.5 shrink-0" />
+        <div className="flex-1 text-[12.5px] text-sky-900 leading-relaxed">
+          <p>{t("inbox.channelsBanner")}</p>
+          <p className="text-[11px] text-sky-800/80 mt-1 font-mono" dir="ltr">
+            {channels.email} · {channels.whatsapp} · {channels.hours}
+          </p>
+        </div>
+      </div>
 
       {/* Mobile pane switcher — only visible <lg */}
       <div className="lg:hidden mb-3">

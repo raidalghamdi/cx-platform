@@ -6,7 +6,7 @@ import { RequirementBadge } from "@/components/brand/RequirementBadge";
 import { cn } from "@/lib/utils";
 
 // Tafa3al (تفاعل) — Saudi national public-consultations platform.
-// DGA Standard 5.18.1: beneficiaries participate in service design via Tafa3al.
+// DGA Standard 5.18.1: customers participate in service design via Tafa3al.
 type Status = "open" | "review" | "closed";
 
 type Consultation = {

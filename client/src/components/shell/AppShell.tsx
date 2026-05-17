@@ -1,6 +1,13 @@
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth, ROLE_NAV } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRolePerms } from "@/lib/rolePermissionsStore";
+import { useNotifications, markRead, markAllRead } from "@/lib/notificationsStore";
+import {
+  DropdownMenu as NotifMenu,
+  DropdownMenuContent as NotifContent,
+  DropdownMenuTrigger as NotifTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useLocale } from "@/contexts/LocaleContext";
 import { Logo } from "@/components/brand/Logo";
 import { AccessibilityPanel } from "@/components/shell/AccessibilityPanel";
@@ -81,9 +88,19 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { t, lang, toggle, isRTL } = useLocale();
   const [location, navigate] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const perms = useRolePerms();
+  const notifs = useNotifications();
+  const unread = notifs.filter((n) => !n.read).length;
 
   if (!user) return null;
-  const allowed = new Set(ROLE_NAV[user.role]);
+  const allowedSet = user.role === "admin"
+    ? new Set<string>(Object.keys(perms.admin))
+    : new Set<string>(
+        Object.entries(perms[user.role] || {})
+          .filter(([, v]) => v)
+          .map(([k]) => k),
+      );
+  const allowed = allowedSet;
   // For dynamic routes, mark journeys active even on /journeys/:id
   const visibleGroups = NAV_GROUPS
     .map((g) => ({ ...g, items: g.items.filter((n) => allowed.has(n.href)) }))
@@ -200,14 +217,67 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             <AccessibilityPanel />
 
-            <button
-              className="relative p-2 rounded-md hover:bg-muted"
-              data-testid="button-notifications"
-              aria-label="Notifications"
-            >
-              <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive ring-2 ring-card" />
-            </button>
+            <NotifMenu>
+              <NotifTrigger asChild>
+                <button
+                  className="relative p-2 rounded-md hover:bg-muted"
+                  data-testid="button-notifications"
+                  aria-label="Notifications"
+                >
+                  <Bell size={18} />
+                  {unread > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center ring-2 ring-card">
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  )}
+                </button>
+              </NotifTrigger>
+              <NotifContent align={isRTL ? "start" : "end"} className="w-80 p-0">
+                <div className="px-3 py-2.5 border-b border-border flex items-center justify-between">
+                  <span className="text-sm font-semibold">{t("notif.title")}</span>
+                  {unread > 0 && (
+                    <button
+                      onClick={() => markAllRead()}
+                      className="text-[11px] text-primary hover:underline"
+                      data-testid="button-mark-all-read"
+                    >
+                      {t("notif.markAll")}
+                    </button>
+                  )}
+                </div>
+                <ul className="max-h-[360px] overflow-y-auto">
+                  {notifs.length === 0 ? (
+                    <li className="px-3 py-6 text-center text-xs text-muted-foreground">{t("notif.empty")}</li>
+                  ) : (
+                    notifs.map((n) => (
+                      <li key={n.id}>
+                        <button
+                          onClick={() => { markRead(n.id); if (n.href) navigate(n.href); }}
+                          className={cn(
+                            "w-full text-start px-3 py-2.5 flex items-start gap-2 hover:bg-muted/50 transition-colors",
+                            !n.read && "bg-primary/5",
+                          )}
+                          data-testid={`notif-${n.id}`}
+                        >
+                          <span className={cn(
+                            "h-2 w-2 rounded-full mt-1.5 shrink-0",
+                            n.severity === "warn" && "bg-rose-500",
+                            n.severity === "info" && "bg-sky-500",
+                            n.severity === "ok" && "bg-emerald-500",
+                          )} />
+                          <span className="flex-1 min-w-0">
+                            <span className={cn("block text-[12.5px] leading-snug", !n.read && "font-semibold")}>
+                              {t(n.titleKey)}
+                            </span>
+                            <span className="block text-[10.5px] text-muted-foreground tabular-nums mt-0.5">{n.at}</span>
+                          </span>
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </NotifContent>
+            </NotifMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

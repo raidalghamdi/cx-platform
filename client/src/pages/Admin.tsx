@@ -28,6 +28,17 @@ import {
   ESCALATION_MATRIX,
   PERMISSIONS_MATRIX,
 } from "@/lib/seed";
+import { useChannels, setChannels } from "@/lib/channelsStore";
+import {
+  useRolePerms,
+  setRolePerms,
+  resetRolePerms,
+  PAGES,
+  ROLES,
+  type Page,
+} from "@/lib/rolePermissionsStore";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -91,7 +102,9 @@ export default function Admin() {
             {t("admin.tab.users")}
           </TabsTrigger>
           <TabsTrigger value="roles" className="whitespace-nowrap shrink-0">{t("admin.tab.roles")}</TabsTrigger>
+          <TabsTrigger value="rolePerms" className="whitespace-nowrap shrink-0">{t("admin.tab.rolePerms")}</TabsTrigger>
           <TabsTrigger value="channels" className="whitespace-nowrap shrink-0">{t("admin.tab.channels")}</TabsTrigger>
+          <TabsTrigger value="contact" className="whitespace-nowrap shrink-0">{t("admin.tab.contact")}</TabsTrigger>
           <TabsTrigger value="sla" className="whitespace-nowrap shrink-0">{t("admin.tab.sla")}</TabsTrigger>
           <TabsTrigger value="escalation" className="whitespace-nowrap shrink-0">{t("admin.tab.escalation")}</TabsTrigger>
         </TabsList>
@@ -146,6 +159,14 @@ export default function Admin() {
               </table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="rolePerms" className="mt-6">
+          <RolePermissionsAdmin />
+        </TabsContent>
+
+        <TabsContent value="contact" className="mt-6">
+          <ContactChannelsAdmin />
         </TabsContent>
 
         <TabsContent value="channels" className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1113,5 +1134,116 @@ function PermPill({ value }: { value: string }) {
     <span className={cn("inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset min-w-[58px]", map[value] || "")}>
       {value === "—" ? "—" : value}
     </span>
+  );
+}
+
+/* ──────────── Contact Channels Admin (Round-2 #4b) ──────────── */
+function ContactChannelsAdmin() {
+  const { t, lang } = useLocale();
+  const channels = useChannels();
+  const { toast } = useToast();
+  const [form, setForm] = useState(channels);
+
+  return (
+    <Card className="shadow-card">
+      <CardContent className="p-6 space-y-4 max-w-xl">
+        <div className="space-y-1.5">
+          <Label className="text-xs">{t("admin.contact.whatsapp")}</Label>
+          <Input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} dir="ltr" data-testid="input-contact-whatsapp" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">{t("admin.contact.email")}</Label>
+          <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} dir="ltr" data-testid="input-contact-email" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">{t("admin.contact.hours")}</Label>
+          <Input value={form.hours} onChange={(e) => setForm({ ...form, hours: e.target.value })} data-testid="input-contact-hours" />
+        </div>
+        <div className="pt-2">
+          <Button onClick={() => { setChannels(form); toast({ title: t("admin.contact.save") }); }} data-testid="button-save-contact">
+            {t("admin.contact.save")}
+          </Button>
+        </div>
+        <p className="text-[11px] text-muted-foreground pt-2">
+          {lang === "ar"
+            ? "تظهر هذه القيم في شريط مصادر صندوق الموظف."
+            : "These values appear in the Inbox source banner."}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ──────────── Role Permissions Matrix (Round-2 #9) ──────────── */
+function RolePermissionsAdmin() {
+  const { t, lang } = useLocale();
+  const { toast } = useToast();
+  const perms = useRolePerms();
+  const [draft, setDraft] = useState(perms);
+
+  function toggle(role: typeof ROLES[number], page: Page) {
+    if (role === "admin") return; // always allowed
+    setDraft({
+      ...draft,
+      [role]: { ...draft[role], [page]: !draft[role][page] },
+    });
+  }
+
+  return (
+    <Card className="shadow-card">
+      <CardContent className="p-0">
+        <div className="px-5 py-3 border-b border-border flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold">{t("admin.tab.rolePerms")}</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{t("admin.rolePerms.intro")}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => { resetRolePerms(); setDraft({ ...perms }); toast({ title: t("admin.rolePerms.reset") }); }}>
+              {t("admin.rolePerms.reset")}
+            </Button>
+            <Button size="sm" onClick={() => { setRolePerms(draft); toast({ title: t("admin.rolePerms.save") }); }} data-testid="button-save-role-perms">
+              {t("admin.rolePerms.save")}
+            </Button>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[760px]">
+            <thead className="text-[11px] uppercase tracking-wider text-muted-foreground bg-muted/40">
+              <tr>
+                <th className="text-start px-3 py-2 font-medium">{t("admin.rolePerms.role")}</th>
+                {PAGES.map((p) => (
+                  <th key={p} className="text-center px-2 py-2 font-medium whitespace-nowrap">{t("nav." + p.slice(1))}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {ROLES.map((role) => (
+                <tr key={role}>
+                  <td className="px-3 py-2 font-medium whitespace-nowrap">{t("role." + role)}</td>
+                  {PAGES.map((p) => {
+                    const v = role === "admin" ? true : !!draft[role][p];
+                    return (
+                      <td key={p} className="px-2 py-2 text-center">
+                        <Checkbox
+                          checked={v}
+                          disabled={role === "admin"}
+                          onCheckedChange={() => toggle(role, p)}
+                          data-testid={`perm-${role}-${p.slice(1)}`}
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
+          {lang === "ar"
+            ? "تتحدث القائمة الجانبية وحراس المسارات فوراً بناءً على هذه الإعدادات."
+            : "Sidebar visibility and route guards update live based on these settings."}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
