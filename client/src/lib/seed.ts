@@ -768,7 +768,7 @@ export const ADMIN_USERS = [
   { id: "u9", name_en: "Sara Al-Shehri", name_ar: "سارة الشهري", role: "quality", status: "active", function_en: "Quality", function_ar: "الجودة" },
   { id: "u10", name_en: "Mohammed Al-Amri", name_ar: "محمد العمري", role: "supervisor", status: "active", function_en: "Operations", function_ar: "العمليات" },
   { id: "u11", name_en: "Aisha Al-Dosari", name_ar: "عائشة الدوسري", role: "supervisor", status: "active", function_en: "Operations", function_ar: "العمليات" },
-  { id: "u12", name_en: "Nour Al-Saud", name_ar: "نور آل سعود", role: "admin", status: "active", function_en: "Administration", function_ar: "الإدارة" },
+  { id: "u12", name_en: "Noor Al Noor", name_ar: "نور النور", role: "admin", status: "active", function_en: "Administration", function_ar: "الإدارة" },
   { id: "u13", name_en: "Khalid Al-Mutairi", name_ar: "خالد المطيري", role: "customer", status: "active", function_en: "Citizen", function_ar: "مواطن" },
   { id: "u14", name_en: "Abdullah Al-Subaie", name_ar: "عبدالله السبيعي", role: "customer", status: "active", function_en: "Citizen", function_ar: "مواطن" },
 ];
